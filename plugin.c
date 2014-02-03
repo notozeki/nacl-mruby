@@ -4,19 +4,29 @@
 #include "ppapi/c/ppb.h"
 #include "ppapi/c/ppp.h"
 #include "ppapi/c/ppp_instance.h"
+#include "ppapi/c/ppp_messaging.h"
 
-#include "mruby.h"
+#include "ppb_interface.h"
+#include "mruby_interface.h"
 
-#include "mruby_instance.h"
-
-static mrb_state *mrb;
-
-/* Plugin Side Interfaces */
 PP_EXPORT const void *
 PPP_GetInterface(const char *interface_name)
 {
   if (strcmp(interface_name, PPP_INSTANCE_INTERFACE) == 0) {
-    return &mruby_interface;
+    static PPP_Instance instance_interface = {
+      Mruby_DidCreate,
+      Mruby_DidDestroy,
+      Mruby_DidChangeView,
+      Mruby_DidChangeFocus,
+      Mruby_HandleDocumentLoad
+    };
+    return &instance_interface;
+  }
+  else if (strcmp(interface_name, PPP_MESSAGING_INTERFACE) == 0) {
+    static PPP_Messaging messaging_interface = {
+      Mruby_HandleMessage
+    };
+    return &messaging_interface;
   }
   return NULL;
 }
@@ -24,12 +34,12 @@ PPP_GetInterface(const char *interface_name)
 PP_EXPORT int32_t
 PPP_InitializeModule(PP_Module module_id, PPB_GetInterface get_browser)
 {
-  mrb = mrb_open();
+  PPB_Interface_Init(get_browser);
   return PP_OK;
 }
 
 PP_EXPORT void
 PPP_ShutdownModule()
 {
-  mrb_close(mrb);
+  /* nothing to do */
 }
