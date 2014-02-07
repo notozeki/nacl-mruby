@@ -88,5 +88,21 @@ Mruby_HandleDocumentLoad(PP_Instance instance, PP_Resource url_loader)
 void
 Mruby_HandleMessage(PP_Instance instance, struct PP_Var message)
 {
-  /* TODO: handle message */
+  mrb_state *mrb;
+  mrb_value result;
+  const char *code;
+  uint32_t code_len;
+  struct PP_Var response;
+
+  code = PPB(Var)->VarToUtf8(message, &code_len);
+
+  mrb = (mrb_state *)htable_find(instance_table, instance);
+  if (!mrb) return;
+
+  result = mrb_load_nstring(mrb, code, code_len);
+  result = mrb_funcall(mrb, result, "inspect", 0);
+
+  response = PPB(Var)->VarFromUtf8(RSTRING_PTR(result), RSTRING_LEN(result));
+  PPB(Messaging)->PostMessage(instance, response);
+  PPB(Var)->Release(response);
 }
