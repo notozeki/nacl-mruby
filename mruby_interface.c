@@ -56,6 +56,7 @@ Mruby_LoadFile_OnRead(void *userdata, int32_t result)
 
   if (result == PP_OK) { /* loading complete */
     mrb_load_nstring(ctx->mrb, RSTRING_PTR(ctx->codestr), RSTRING_LEN(ctx->codestr));
+    free(ctx);
   }
   else if (result > 0) {
     mrb_str_cat(ctx->mrb, ctx->codestr, ctx->buf, result);
@@ -117,12 +118,14 @@ Mruby_LoadFile(PP_Instance instance, mrb_state *mrb, const char *fname)
   /* load file */
   loader = PPB(URLLoader)->Create(instance);
   ctx = (struct LoadFileContext *)malloc(sizeof(struct LoadFileContext));
+  if (!ctx) goto cleanup;
   ctx->mrb = mrb;
   ctx->loader = loader;
   ctx->codestr = mrb_str_buf_new(mrb, 0);
   cc = PP_MakeCompletionCallback(Mruby_LoadFile_OnOpen, ctx);
   PPB(URLLoader)->Open(loader, req_info, cc);
 
+ cleanup:
   PPB(Var)->Release(url);
   PPB(Var)->Release(method);
 }
