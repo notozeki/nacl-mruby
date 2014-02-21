@@ -1,7 +1,9 @@
-#include <string.h> /* strlen */
+#include <stdlib.h>
+#include <string.h>
 
 #include <mruby.h>
 #include <mruby/compile.h>
+#include <mruby/hash.h>
 #include <mruby/string.h>
 
 #include "ppapi/c/pp_errors.h"
@@ -10,7 +12,6 @@
 #include "ppapi/c/ppp_instance.h"
 
 #include "nacl_mruby.h"
-#include "ppb_interface.h"
 #include "mruby_interface.h"
 #include "htable.h"
 #include "load_file.h"
@@ -42,8 +43,27 @@ static htable_type instance_table_type = {
   instance_table_free
 };
 
+static mrb_value
+make_args_hash(mrb_state *mrb, uint32_t argc,
+	       const char *argn[], const char *argv[])
+{
+  mrb_value args_hash;
+  int i;
+
+  args_hash = mrb_hash_new_capa(mrb, argc);
+  for (i = 0; i < argc; i++) {
+    mrb_value name, value;
+    name = mrb_str_new_cstr(mrb, argn[i]);
+    value = mrb_str_new_cstr(mrb, argv[i]);
+    mrb_hash_set(mrb, args_hash, name, value);
+  }
+
+  return args_hash;
+}
+
 struct callback_args {
   mrb_state *mrb;
+  mrb_value args_hash;
 };
 
 static void
@@ -51,8 +71,10 @@ load_file_callback(char *code, int codelen, void *data)
 {
   struct callback_args *args = (struct callback_args *)data;
   mrb_state *mrb = args->mrb;
+  mrb_value args_hash = args->args_hash;
 
   mrb_load_nstring(mrb, code, codelen);
+  MRB_INSTANCE_VALUE(mrb) = nacl_mruby_create_instance(mrb, args_hash);
 
   free(args);
 }
@@ -70,6 +92,7 @@ Mruby_DidCreate(PP_Instance instance, uint32_t argc,
   }
 
   mrb = nacl_mruby_init(instance);
+  if (!mrb) return PP_FALSE;
   htable_insert(instance_table, instance, mrb);
 
   /* load entry point file */
@@ -83,7 +106,9 @@ Mruby_DidCreate(PP_Instance instance, uint32_t argc,
 	return PP_FALSE;
       }
       args->mrb = mrb;
+      args->args_hash = make_args_hash(mrb, argc, argn, argv);
       load_file_async(instance, argv[i], load_file_callback, args);
+      break;
     }
   }
 
@@ -104,40 +129,44 @@ Mruby_DidDestroy(PP_Instance instance)
 void
 Mruby_DidChangeView(PP_Instance instance, PP_Resource view)
 {
-  /* nothing to do */
+  mrb_state *mrb;
+
+  mrb = htable_find(instance_table, instance);
+  nacl_mruby_did_change_view(mrb, view);
 }
 
 void
 Mruby_DidChangeFocus(PP_Instance instance, PP_Bool has_focus)
 {
-  /* nothing to do */
+  mrb_state *mrb;
+
+  mrb = htable_find(instance_table, instance);
+  nacl_mruby_did_change_focus(mrb, has_focus);
 }
 
 PP_Bool
 Mruby_HandleDocumentLoad(PP_Instance instance, PP_Resource url_loader)
 {
-  /* nothing to do */
-  return PP_FALSE;
+  mrb_state *mrb;
+
+  mrb = htable_find(instance_table, instance);
+  return nacl_mruby_handle_document_load(mrb, url_loader);
+}
+
+PP_Bool
+Mruby_HandleInputEvent(PP_Instance instance, PP_Resource event)
+{
+  mrb_state *mrb;
+
+  mrb = htable_find(instance_table, instance);
+  return nacl_mruby_handle_input_event(mrb, event);
 }
 
 void
 Mruby_HandleMessage(PP_Instance instance, struct PP_Var message)
 {
   mrb_state *mrb;
-  mrb_value result;
-  const char *code;
-  uint32_t code_len;
-  struct PP_Var response;
 
-  code = PPB(Var)->VarToUtf8(message, &code_len);
-
-  mrb = (mrb_state *)htable_find(instance_table, instance);
-  if (!mrb) return;
-
-  result = mrb_load_nstring(mrb, code, code_len);
-  result = mrb_funcall(mrb, result, "inspect", 0);
-
-  response = PPB(Var)->VarFromUtf8(RSTRING_PTR(result), RSTRING_LEN(result));
-  PPB(Messaging)->PostMessage(instance, response);
-  PPB(Var)->Release(response);
+  mrb = htable_find(instance_table, instance);
+  nacl_mruby_handle_message(mrb, message);
 }

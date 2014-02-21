@@ -4,6 +4,7 @@
 #include "ppapi/c/ppb.h"
 #include "ppapi/c/ppp.h"
 #include "ppapi/c/ppp_instance.h"
+#include "ppapi/c/ppp_input_event.h"
 #include "ppapi/c/ppp_messaging.h"
 
 #include "ppb_interface.h"
@@ -21,6 +22,12 @@ PPP_GetInterface(const char *interface_name)
       Mruby_HandleDocumentLoad
     };
     return &instance_interface;
+  }
+  else if (strcmp(interface_name, PPP_INPUT_EVENT_INTERFACE) == 0) {
+    static PPP_InputEvent input_event_interface = {
+      Mruby_HandleInputEvent
+    };
+    return &input_event_interface;
   }
   else if (strcmp(interface_name, PPP_MESSAGING_INTERFACE) == 0) {
     static PPP_Messaging messaging_interface = {
