@@ -110,9 +110,10 @@ nacl_conf = NaClConfig.new('mac', 'newlib')
     toolchain :gcc
 
     conf.cc.command = nacl_conf.cc(arch)
+    conf.cc.flags << '-g'
 
     conf.linker.command = nacl_conf.linker(arch)
-    conf.linker.flags << "-Wl,-as-needed"
+    conf.linker.flags << '-Wl,-as-needed'
 
     conf.archiver.command = nacl_conf.archiver(arch)
 
