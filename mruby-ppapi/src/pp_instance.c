@@ -1,0 +1,106 @@
+#include <mruby.h>
+#include <mruby/string.h>
+
+#include "ppb_interface.h"
+#include "nacl_mruby.h"
+
+#include "ppapi.h"
+
+struct RClass *mrb_pp_instance_class;
+
+static mrb_value
+log_to_console(mrb_state *mrb, mrb_value self)
+{
+  mrb_value level, value;
+
+  mrb_get_args(mrb, "io", &level, &value);
+  switch (mrb_fixnum(level)) {
+  case PP_LOGLEVEL_TIP:
+  case PP_LOGLEVEL_LOG:
+  case PP_LOGLEVEL_WARNING:
+  case PP_LOGLEVEL_ERROR:
+    /* it's ok */
+    break;
+  default:
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "invalid level");
+    break;
+  }
+  if (!mrb_obj_is_instance_of(mrb, value, mrb_pp_var_class)) {
+    value = mrb_obj_new(mrb, mrb_pp_var_class, 1, &value);
+  }
+
+  PPB(Console)->Log(MRB_PP_INSTANCE(mrb), mrb_fixnum(level), MRB_PP_VAR_VAR(value));
+  
+  return mrb_nil_value();
+}
+
+static mrb_value
+log_to_console_with_source(mrb_state *mrb, mrb_value self)
+{
+  mrb_value level, source, value;
+
+  mrb_get_args(mrb, "ioo", &level, &source, &value);
+  switch (mrb_fixnum(level)) {
+  case PP_LOGLEVEL_TIP:
+  case PP_LOGLEVEL_LOG:
+  case PP_LOGLEVEL_WARNING:
+  case PP_LOGLEVEL_ERROR:
+    /* it's ok */
+    break;
+  default:
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "invalid level");
+    break;
+  }
+  if (!mrb_obj_is_instance_of(mrb, source, mrb_pp_var_class)) {
+    source = mrb_obj_new(mrb, mrb_pp_var_class, 1, &source);
+  }
+  if (!mrb_obj_is_instance_of(mrb, value, mrb_pp_var_class)) {
+    value = mrb_obj_new(mrb, mrb_pp_var_class, 1, &value);
+  }
+
+  PPB(Console)->LogWithSource(MRB_PP_INSTANCE(mrb), mrb_fixnum(level),
+			      MRB_PP_VAR_VAR(source), MRB_PP_VAR_VAR(value));
+  
+  return mrb_nil_value();
+}
+
+static mrb_value
+post_message(mrb_state *mrb, mrb_value self)
+{
+  mrb_value message;
+
+  mrb_get_args(mrb, "o", &message);
+  if (!mrb_obj_is_instance_of(mrb, message, mrb_pp_var_class)) {
+    message = mrb_obj_new(mrb, mrb_pp_var_class, 1, &message);
+  }
+
+  PPB(Messaging)->PostMessage(MRB_PP_INSTANCE(mrb), MRB_PP_VAR_VAR(message));
+
+  return mrb_nil_value();
+}
+
+void
+mrb_pp_instance_init(mrb_state *mrb)
+{
+  struct RClass *loglevel;
+
+  mrb_pp_instance_class = mrb_define_class_under(mrb, mrb_pp_module, "Instance", mrb->object_class);
+
+  /* constants map to enum PP_LogLevel */
+  loglevel = mrb_define_module_under(mrb, mrb_pp_module, "LogLevel");
+  mrb_define_const(mrb, loglevel, "TIP", mrb_fixnum_value(PP_LOGLEVEL_TIP));
+  mrb_define_const(mrb, loglevel, "LOG", mrb_fixnum_value(PP_LOGLEVEL_LOG));
+  mrb_define_const(mrb, loglevel, "WARNING", mrb_fixnum_value(PP_LOGLEVEL_WARNING));
+  mrb_define_const(mrb, loglevel, "ERROR", mrb_fixnum_value(PP_LOGLEVEL_ERROR));
+
+  /* PPB_Instance methods for querying the browser: */
+  //mrb_define_method(mrb, mrb_pp_instance_class, "bind_graphics", bind_graphics, MRB_ARGS_REQ(1));
+  //mrb_define_method(mrb, mrb_pp_instance_class, "is_full_frame", is_full_frame, MRB_ARGS_NONE());
+  //mrb_define_method(mrb, mrb_pp_instance_class, "request_input_events", request_input_events, MRB_ARGS_REQ(1));
+  //mrb_define_method(mrb, mrb_pp_instance_class, "request_filtering_input_events", request_filtering_input_events, MRB_ARGS_REQ(1));
+  //mrb_define_method(mrb, mrb_pp_instance_class, "clear_input_event_request", clear_input_event_request, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, mrb_pp_instance_class, "post_message", post_message, MRB_ARGS_REQ(1));
+  /* PPB_Console methods for logging to the console: */
+  mrb_define_method(mrb, mrb_pp_instance_class, "log_to_console", log_to_console, MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, mrb_pp_instance_class, "log_to_console_with_source", log_to_console_with_source, MRB_ARGS_REQ(3));
+}

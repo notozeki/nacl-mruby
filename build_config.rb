@@ -101,6 +101,10 @@ class NaClConfig
   def archiver(arch)
     "#{tc_bin(arch)}/#{arch}-nacl-ar"
   end
+
+  def include
+    "#{SDK_ROOT}/include"
+  end
 end
 
 nacl_conf = NaClConfig.new('mac', 'newlib')
@@ -120,6 +124,10 @@ nacl_conf = NaClConfig.new('mac', 'newlib')
     #conf.build_mrbtest_lib_only
 
     #conf.gem 'examples/mrbgems/c_and_ruby_extension_example'
+    conf.gem '../mruby-ppapi' do |gemconf|
+      gemconf.cc.include_paths << nacl_conf.include
+      gemconf.cc.include_paths << '../'
+    end
 
     conf.test_runner.command = 'env'
   end

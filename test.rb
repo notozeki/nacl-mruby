@@ -1,12 +1,13 @@
-class MyInstance
-  def log(message)
-    # not implemented
-  end
+class MyInstance < PP::Instance
+  alias log log_to_console
+  alias log_with_source log_to_console_with_source
+  include PP::LogLevel
 
   def initialize(args)
-    args.each do |k,v|
-      log("#{k.inspect} => #{v.inspect}")
+    args.each do |k, v|
+      log(LOG, "#{k.inspect} => #{v.inspect}")
     end
+    post_message('done')
   end
 
   def did_change_view(view)
