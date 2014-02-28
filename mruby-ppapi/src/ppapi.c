@@ -15,6 +15,7 @@ mrb_ppapi_gem_init(mrb_state *mrb)
 
   mrb_pp_instance_init(mrb);
   mrb_pp_var_init(mrb);
+  mrb_pp_var_array_init(mrb);
 }
 
 void

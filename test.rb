@@ -40,6 +40,11 @@ class MyInstance < PP::Instance
       log_inspect message.as_double
     when message.string?
       log_inspect message.as_string
+    when message.array?
+      ary = PP::VarArray.new(message)
+      ary.each do |e|
+        log_inspect e.to_obj
+      end
     else
       log_inspect message.to_obj
     end
