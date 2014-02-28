@@ -31,37 +31,7 @@ class MyInstance < PP::Instance
   end
 
   def handle_message(message)
-    if message.bool?
-      log_inspect message.as_bool
-    elsif message.int?
-      log_inspect message.as_int
-    elsif message.double?
-      log_inspect message.as_double
-    elsif message.string?
-      log_inspect message.as_string
-    elsif message.array?
-      ary = PP::VarArray.new(message)
-      ary.each do |e|
-        log_inspect e.to_obj
-      end
-    elsif message.dictionary?
-      dic = PP::VarDictionary.new(message)
-      dic.each do |k, v|
-        log(TIP, "#{k.to_obj}: #{v.to_obj}")
-      end
-    elsif message.array_buffer?
-      ab = PP::VarArrayBuffer.new(message)
-      len = ab.byte_length
-      s = ab.map
-      len.times do |i|
-        log_inspect s[i]
-      end
-      ab.unmap
-    else
-      log_inspect message.to_obj
-    end
-  rescue => e
-    log(ERROR, e.inspect)
+    log_inspect message.to_obj
   end
 end
 

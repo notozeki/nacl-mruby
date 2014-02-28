@@ -272,94 +272,6 @@ as_string(mrb_state *mrb, mrb_value self)
   return mrb_str_new(mrb, s, len);
 }
 
-static mrb_value
-to_obj_internal(mrb_state *mrb, struct PP_Var var)
-{
-  mrb_value ret;
-  const char *s;
-  uint32_t len, i;
-  struct PP_Var keys, key, value;
-
-  switch (var.type) {
-  case PP_VARTYPE_UNDEFINED:
-  case PP_VARTYPE_NULL:
-    ret = mrb_nil_value();
-    break;
-
-  case PP_VARTYPE_BOOL:
-    if (var.value.as_bool == PP_TRUE) {
-      ret = mrb_true_value();
-    }
-    else {
-      ret = mrb_false_value();
-    }
-    break;
-
-  case PP_VARTYPE_STRING:
-    s = PPB(Var)->VarToUtf8(var, &len);
-    ret = mrb_str_new(mrb, s, len);
-    break;
-
-  case PP_VARTYPE_OBJECT:
-    /* not currently usable from module */
-    mrb_raise(mrb, E_TYPE_ERROR, "can't convert PP_Var(type=PP_VARTYPE_OBJECT) into Ruby's object");
-    break;
-
-  case PP_VARTYPE_ARRAY:
-    len = PPB(VarArray)->GetLength(var);
-    ret = mrb_ary_new_capa(mrb, len);
-    for (i = 0; i < len; i++) {
-      value = PPB(VarArray)->Get(var, i);
-      mrb_ary_push(mrb, ret, to_obj_internal(mrb, value));
-    }
-    break;
-
-  case PP_VARTYPE_DICTIONARY:
-    keys = PPB(VarDictionary)->GetKeys(var);
-    len = PPB(VarArray)->GetLength(keys);
-    ret = mrb_hash_new_capa(mrb, len);
-    for (i = 0; i < len; i++) {
-      key = PPB(VarArray)->Get(keys, i);
-      value = PPB(VarDictionary)->Get(var, key);
-      mrb_hash_set(mrb, ret, to_obj_internal(mrb, key), to_obj_internal(mrb, value));
-    }
-    PPB(Var)->Release(keys);
-    break;
-
-  case PP_VARTYPE_INT32:
-    i = var.value.as_int;
-    if (FIXABLE(i)) {
-      ret = mrb_fixnum_value(i);
-    }
-    else {
-      ret = mrb_float_value(mrb, i);
-    }
-    break;
-
-  case PP_VARTYPE_DOUBLE:
-    ret = mrb_float_value(mrb, var.value.as_double);
-    break;
-
-  case PP_VARTYPE_ARRAY_BUFFER:
-    PPB(VarArrayBuffer)->ByteLength(var, &len);
-    s = PPB(VarArrayBuffer)->Map(var);
-    ret = mrb_str_new(mrb, s, len);
-    break;
-
-  default:
-    mrb_bug(mrb, "unknown type of PP_Var");
-    break;
-  }
-
-  return ret;
-}
-
-static mrb_value
-to_obj(mrb_state *mrb, mrb_value self)
-{
-  return to_obj_internal(mrb, MRB_PP_VAR_VAR(self));
-}
-
 mrb_value
 mrb_pp_var_new_raw(mrb_state *mrb, struct PP_Var var)
 {
@@ -392,7 +304,4 @@ mrb_pp_var_init(mrb_state *mrb)
   mrb_define_method(mrb, mrb_pp_var_class, "as_int", as_int, MRB_ARGS_NONE());
   mrb_define_method(mrb, mrb_pp_var_class, "as_double", as_double, MRB_ARGS_NONE());
   mrb_define_method(mrb, mrb_pp_var_class, "as_string", as_string, MRB_ARGS_NONE());
-
-  /* NOTE: to_obj is not provided in original C++ API. */
-  mrb_define_method(mrb, mrb_pp_var_class, "to_obj", to_obj, MRB_ARGS_NONE());
 }
