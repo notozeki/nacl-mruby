@@ -7,6 +7,9 @@
 #include "ppapi/c/ppb_url_loader.h"
 #include "ppapi/c/ppb_url_request_info.h"
 #include "ppapi/c/ppb_var.h"
+#include "ppapi/c/ppb_var_array.h"
+#include "ppapi/c/ppb_var_array_buffer.h"
+#include "ppapi/c/ppb_var_dictionary.h"
 
 struct PPB_Interface {
   PPB_Console *Console;
@@ -14,6 +17,9 @@ struct PPB_Interface {
   PPB_URLLoader *URLLoader;
   PPB_URLRequestInfo *URLRequestInfo;
   PPB_Var *Var;
+  PPB_VarArray *VarArray;
+  PPB_VarArrayBuffer *VarArrayBuffer;
+  PPB_VarDictionary *VarDictionary;
 };
 extern struct PPB_Interface ppb_interface;
 

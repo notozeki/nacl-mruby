@@ -8,6 +8,7 @@
 #include "ppapi/c/ppp_messaging.h"
 
 #include "nacl_mruby.h"
+#include "mruby-ppapi/src/pp_var.h"
 
 static mrb_allocf
 mrb_default_allocf()
@@ -88,4 +89,11 @@ void
 nacl_mruby_handle_message(mrb_state *mrb, struct PP_Var message)
 {
   /* TODO */
+  mrb_value msg;
+
+  msg = mrb_pp_var_new_raw(mrb, message);
+  if (mrb_respond_to(mrb, MRB_INSTANCE_VALUE(mrb),
+		     mrb_intern_lit(mrb, "handle_message"))) {
+    mrb_funcall(mrb, MRB_INSTANCE_VALUE(mrb), "handle_message", 1, msg);
+  }
 }
