@@ -50,7 +50,7 @@ set(mrb_state *mrb, mrb_value self)
   var = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "var"));
 
   mrb_get_args(mrb, "io", &index, &value);
-  if (!mrb_obj_is_instance_of(mrb, var, mrb_pp_var_class)) {
+  if (!mrb_obj_is_instance_of(mrb, value, mrb_pp_var_class)) {
     mrb_raise(mrb, E_TYPE_ERROR, "not a PP::Var instance");
   }
 
