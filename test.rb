@@ -31,19 +31,23 @@ class MyInstance < PP::Instance
   end
 
   def handle_message(message)
-    case
-    when message.bool?
+    if message.bool?
       log_inspect message.as_bool
-    when message.int?
+    elsif message.int?
       log_inspect message.as_int
-    when message.double?
+    elsif message.double?
       log_inspect message.as_double
-    when message.string?
+    elsif message.string?
       log_inspect message.as_string
-    when message.array?
+    elsif message.array?
       ary = PP::VarArray.new(message)
       ary.each do |e|
         log_inspect e.to_obj
+      end
+    elsif message.dictionary?
+      dic = PP::VarDictionary.new(message)
+      dic.each do |k, v|
+        log(TIP, "#{k.to_obj}: #{v.to_obj}")
       end
     else
       log_inspect message.to_obj
