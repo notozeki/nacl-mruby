@@ -49,6 +49,14 @@ class MyInstance < PP::Instance
       dic.each do |k, v|
         log(TIP, "#{k.to_obj}: #{v.to_obj}")
       end
+    elsif message.array_buffer?
+      ab = PP::VarArrayBuffer.new(message)
+      len = ab.byte_length
+      s = ab.map
+      len.times do |i|
+        log_inspect s[i]
+      end
+      ab.unmap
     else
       log_inspect message.to_obj
     end

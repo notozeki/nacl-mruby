@@ -1,4 +1,6 @@
 *~
+nacl-debug-script
 newlib/
 server/
 mruby/
+tmp/
