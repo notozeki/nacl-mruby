@@ -26,7 +26,7 @@ log_to_console(mrb_state *mrb, mrb_value self)
     break;
   }
   if (!mrb_obj_is_instance_of(mrb, value, mrb_pp_var_class)) {
-    value = mrb_obj_new(mrb, mrb_pp_var_class, 1, &value);
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var instance", value);
   }
 
   PPB(Console)->Log(MRB_PP_INSTANCE(mrb), mrb_fixnum(level), MRB_PP_VAR_VAR(value));
@@ -52,10 +52,10 @@ log_to_console_with_source(mrb_state *mrb, mrb_value self)
     break;
   }
   if (!mrb_obj_is_instance_of(mrb, source, mrb_pp_var_class)) {
-    source = mrb_obj_new(mrb, mrb_pp_var_class, 1, &source);
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var instance", source);
   }
   if (!mrb_obj_is_instance_of(mrb, value, mrb_pp_var_class)) {
-    value = mrb_obj_new(mrb, mrb_pp_var_class, 1, &value);
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var instance", value);
   }
 
   PPB(Console)->LogWithSource(MRB_PP_INSTANCE(mrb), mrb_fixnum(level),
@@ -71,7 +71,7 @@ post_message(mrb_state *mrb, mrb_value self)
 
   mrb_get_args(mrb, "o", &message);
   if (!mrb_obj_is_instance_of(mrb, message, mrb_pp_var_class)) {
-    message = mrb_obj_new(mrb, mrb_pp_var_class, 1, &message);
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var instance", message);
   }
 
   PPB(Messaging)->PostMessage(MRB_PP_INSTANCE(mrb), MRB_PP_VAR_VAR(message));

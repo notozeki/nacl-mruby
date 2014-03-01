@@ -1,14 +1,37 @@
+module LogUtils
+  def log(obj)
+    log_to_console(PP::LogLevel::LOG, PP::Var.new(obj))
+  end
+
+  def log_tip(obj)
+    log_to_console(PP::LogLevel::TIP, PP::Var.new(obj))
+  end
+
+  def log_warning(obj)
+    log_to_console(PP::LogLevel::WARNING, PP::Var.new(obj))
+  end
+
+  def log_error(obj)
+    log_to_console(PP::LogLevel::ERROR, PP::Var.new(obj))
+  end
+
+  def log_inspect(obj)
+    log_tip(obj.inspect)
+  end
+
+  def log_exception(e)
+    log_error(e.inspect)
+  end
+end
+
 class MyInstance < PP::Instance
-  alias log log_to_console
-  alias log_with_source log_to_console_with_source
-  include PP
-  include PP::LogLevel
+  include LogUtils
 
   def initialize(args)
-    #args.each do |k, v|
-    #  log(LOG, "#{k.inspect} => #{v.inspect}")
-    #end
-    #post_message('done')
+    log_inspect(args)
+    post_message('done')
+  rescue => e
+    log_exception(e)
   end
 
   def did_change_view(view)
@@ -18,7 +41,7 @@ class MyInstance < PP::Instance
     log_inspect rect.width
     log_inspect rect.height
   rescue => e
-    log(ERROR, e.inspect)
+    log_exception(e)
   end
 
   def did_change_focus(has_focus)
@@ -31,10 +54,6 @@ class MyInstance < PP::Instance
 
   def handle_input_event(event)
     false
-  end
-
-  def log_inspect(obj)
-    log(TIP, obj.inspect)
   end
 
   def handle_message(message)
