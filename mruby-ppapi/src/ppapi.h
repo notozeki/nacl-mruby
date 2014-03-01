@@ -10,5 +10,6 @@ extern struct RClass *mrb_pp_module;
 #include "pp_var_array.h"
 #include "pp_var_array_buffer.h"
 #include "pp_var_dictionary.h"
+#include "pp_view.h"
 
 #endif /* MRUBY_PPAPI_PPAPI_H */

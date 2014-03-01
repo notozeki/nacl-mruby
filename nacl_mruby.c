@@ -9,6 +9,7 @@
 
 #include "nacl_mruby.h"
 #include "mruby-ppapi/src/pp_var.h"
+#include "mruby-ppapi/src/pp_view.h"
 
 static mrb_allocf
 mrb_default_allocf()
@@ -63,6 +64,15 @@ void
 nacl_mruby_did_change_view(mrb_state *mrb, PP_Resource view)
 {
   /* TODO */
+  mrb_value v;
+
+  if (mrb_nil_p(MRB_INSTANCE_VALUE(mrb))) return;
+
+  v = mrb_pp_view_new_raw(mrb, view);
+  if (mrb_respond_to(mrb, MRB_INSTANCE_VALUE(mrb),
+  		     mrb_intern_lit(mrb, "did_change_view"))) {
+    mrb_funcall(mrb, MRB_INSTANCE_VALUE(mrb), "did_change_view", 1, v);
+  }
 }
 
 void

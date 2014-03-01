@@ -1,6 +1,7 @@
 class MyInstance < PP::Instance
   alias log log_to_console
   alias log_with_source log_to_console_with_source
+  include PP
   include PP::LogLevel
 
   def initialize(args)
@@ -11,7 +12,13 @@ class MyInstance < PP::Instance
   end
 
   def did_change_view(view)
-    # nothing to do
+    rect = view.get_rect
+    log_inspect rect.x
+    log_inspect rect.y
+    log_inspect rect.width
+    log_inspect rect.height
+  rescue => e
+    log(ERROR, e.inspect)
   end
 
   def did_change_focus(has_focus)
