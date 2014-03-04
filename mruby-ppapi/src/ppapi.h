@@ -6,6 +6,7 @@
 extern struct RClass *mrb_pp_module;
 
 #include "pp_instance.h"
+#include "pp_resource.h"
 #include "pp_var.h"
 #include "pp_var_array.h"
 #include "pp_var_array_buffer.h"
