@@ -41,6 +41,12 @@ initialize(mrb_state *mrb, mrb_value self)
   return self;
 }
 
+static mrb_value
+is_null(mrb_state *mrb, mrb_value self)
+{
+  return (MRB_PP_RESOURCE(self) == 0) ? mrb_true_value() : mrb_false_value();
+}
+
 mrb_value
 mrb_pp_resource_new_raw(mrb_state *mrb, struct RClass *klass, PP_Resource resource)
 {
@@ -62,4 +68,5 @@ mrb_pp_resource_init(mrb_state *mrb)
   mrb_pp_resource_class = mrb_define_class_under(mrb, mrb_pp_module, "Resource", mrb->object_class);
 
   mrb_define_method(mrb, mrb_pp_resource_class, "initialize", initialize, MRB_ARGS_NONE());
+  mrb_define_method(mrb, mrb_pp_resource_class, "is_null", is_null, MRB_ARGS_NONE());
 }
