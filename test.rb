@@ -28,20 +28,12 @@ class MyInstance < PP::Instance
   include LogUtils
 
   def initialize(args)
-    log_inspect(args)
-    post_message('done')
-  rescue => e
+    request_input_events(PP::InputEvent::Class::MOUSE | PP::InputEvent::Class::KEYBOARD)
+  rescue Exception => e
     log_exception(e)
   end
 
   def did_change_view(view)
-    rect = view.get_rect
-    log_inspect rect.x
-    log_inspect rect.y
-    log_inspect rect.width
-    log_inspect rect.height
-  rescue => e
-    log_exception(e)
   end
 
   def did_change_focus(has_focus)
@@ -53,7 +45,10 @@ class MyInstance < PP::Instance
   end
 
   def handle_input_event(event)
-    false
+    log_inspect event
+    true
+  rescue Exception => e
+    log_exception(e)
   end
 
   def handle_message(message)

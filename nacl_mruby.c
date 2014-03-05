@@ -8,6 +8,7 @@
 #include "ppapi/c/ppp_messaging.h"
 
 #include "nacl_mruby.h"
+#include "mruby-ppapi/src/pp_input_event.h"
 #include "mruby-ppapi/src/pp_var.h"
 #include "mruby-ppapi/src/pp_view.h"
 
@@ -92,7 +93,16 @@ PP_Bool
 nacl_mruby_handle_input_event(mrb_state *mrb, PP_Resource input_event)
 {
   /* TODO */
-  return PP_FALSE;
+  mrb_value v, ret;
+
+  if (mrb_nil_p(MRB_INSTANCE_VALUE(mrb))) return PP_FALSE;
+
+  v = mrb_pp_input_event_new_raw(mrb, input_event);
+  if (mrb_respond_to(mrb, MRB_INSTANCE_VALUE(mrb),
+  		     mrb_intern_lit(mrb, "handle_input_event"))) {
+    ret = mrb_funcall(mrb, MRB_INSTANCE_VALUE(mrb), "handle_input_event", 1, v);
+  }
+  return mrb_test(ret) ? PP_TRUE : PP_FALSE;
 }
 
 void

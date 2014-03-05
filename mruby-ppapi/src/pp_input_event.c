@@ -42,7 +42,7 @@ mrb_pp_input_event_new_raw(mrb_state *mrb, PP_Resource input_event)
 void
 mrb_pp_input_event_init(mrb_state *mrb)
 {
-  struct RClass *type, *modifier;
+  struct RClass *type, *modifier, *klass;
 
   mrb_pp_input_event_class = mrb_define_class_under(mrb, mrb_pp_module, "InputEvent", mrb_pp_resource_class);
 
@@ -84,6 +84,14 @@ mrb_pp_input_event_init(mrb_state *mrb)
   mrb_define_const(mrb, modifier, "NUMLOCKKEY",       mrb_fixnum_value(PP_INPUTEVENT_MODIFIER_NUMLOCKKEY));
   mrb_define_const(mrb, modifier, "ISLEFT",           mrb_fixnum_value(PP_INPUTEVENT_MODIFIER_ISLEFT));
   mrb_define_const(mrb, modifier, "ISRIGHT",          mrb_fixnum_value(PP_INPUTEVENT_MODIFIER_ISRIGHT));
+
+  /* PP_InputEvent_Class constants */
+  klass = mrb_define_module_under(mrb, mrb_pp_input_event_class, "Class");
+  mrb_define_const(mrb, klass, "MOUSE", mrb_fixnum_value(PP_INPUTEVENT_CLASS_MOUSE));
+  mrb_define_const(mrb, klass, "KEYBOARD", mrb_fixnum_value(PP_INPUTEVENT_CLASS_KEYBOARD));
+  mrb_define_const(mrb, klass, "WHEEL", mrb_fixnum_value(PP_INPUTEVENT_CLASS_WHEEL));
+  mrb_define_const(mrb, klass, "TOUCH", mrb_fixnum_value(PP_INPUTEVENT_CLASS_TOUCH));
+  mrb_define_const(mrb, klass, "IME", mrb_fixnum_value(PP_INPUTEVENT_CLASS_IME));
 
   mrb_define_method(mrb, mrb_pp_input_event_class, "get_type", get_type, MRB_ARGS_NONE());
   mrb_define_method(mrb, mrb_pp_input_event_class, "get_time_stamp", get_time_stamp, MRB_ARGS_NONE());

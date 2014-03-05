@@ -9,6 +9,38 @@
 struct RClass *mrb_pp_instance_class;
 
 static mrb_value
+request_input_events(mrb_state *mrb, mrb_value self)
+{
+  mrb_int event_classes;
+  int32_t ret;
+
+  mrb_get_args(mrb, "i", &event_classes);
+  ret = PPB(InputEvent)->RequestInputEvents(MRB_PP_INSTANCE(mrb), event_classes);
+  return mrb_fixnum_value(ret);
+}
+
+static mrb_value
+request_filtering_input_events(mrb_state *mrb, mrb_value self)
+{
+  mrb_int event_classes;
+  int32_t ret;
+
+  mrb_get_args(mrb, "i", &event_classes);
+  ret = PPB(InputEvent)->RequestFilteringInputEvents(MRB_PP_INSTANCE(mrb), event_classes);
+  return mrb_fixnum_value(ret);
+}
+
+static mrb_value
+clear_input_event_request(mrb_state *mrb, mrb_value self)
+{
+  mrb_int event_classes;
+
+  mrb_get_args(mrb, "i", &event_classes);
+  PPB(InputEvent)->ClearInputEventRequest(MRB_PP_INSTANCE(mrb), event_classes);
+  return mrb_nil_value();
+}
+
+static mrb_value
 log_to_console(mrb_state *mrb, mrb_value self)
 {
   mrb_value level, value;
@@ -96,9 +128,9 @@ mrb_pp_instance_init(mrb_state *mrb)
   /* PPB_Instance methods for querying the browser: */
   //mrb_define_method(mrb, mrb_pp_instance_class, "bind_graphics", bind_graphics, MRB_ARGS_REQ(1));
   //mrb_define_method(mrb, mrb_pp_instance_class, "is_full_frame", is_full_frame, MRB_ARGS_NONE());
-  //mrb_define_method(mrb, mrb_pp_instance_class, "request_input_events", request_input_events, MRB_ARGS_REQ(1));
-  //mrb_define_method(mrb, mrb_pp_instance_class, "request_filtering_input_events", request_filtering_input_events, MRB_ARGS_REQ(1));
-  //mrb_define_method(mrb, mrb_pp_instance_class, "clear_input_event_request", clear_input_event_request, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, mrb_pp_instance_class, "request_input_events", request_input_events, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, mrb_pp_instance_class, "request_filtering_input_events", request_filtering_input_events, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, mrb_pp_instance_class, "clear_input_event_request", clear_input_event_request, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, mrb_pp_instance_class, "post_message", post_message, MRB_ARGS_REQ(1));
   /* PPB_Console methods for logging to the console: */
   mrb_define_method(mrb, mrb_pp_instance_class, "log_to_console", log_to_console, MRB_ARGS_REQ(2));
