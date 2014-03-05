@@ -9,6 +9,7 @@ PPB_Interface_Init(PPB_GetInterface get_browser)
 {
   PPB(Console)        = (PPB_Console *)get_browser(PPB_CONSOLE_INTERFACE);
   PPB(Core)           = (PPB_Core *)get_browser(PPB_CORE_INTERFACE);
+  PPB(InputEvent)     = (PPB_InputEvent *)get_browser(PPB_INPUT_EVENT_INTERFACE);
   PPB(Messaging)      = (PPB_Messaging *)get_browser(PPB_MESSAGING_INTERFACE);
   PPB(URLLoader)      = (PPB_URLLoader *)get_browser(PPB_URLLOADER_INTERFACE);
   PPB(URLRequestInfo) = (PPB_URLRequestInfo *)get_browser(PPB_URLREQUESTINFO_INTERFACE);

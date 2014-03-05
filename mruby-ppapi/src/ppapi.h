@@ -5,6 +5,7 @@
 
 extern struct RClass *mrb_pp_module;
 
+#include "pp_input_event.h"
 #include "pp_instance.h"
 #include "pp_resource.h"
 #include "pp_var.h"
