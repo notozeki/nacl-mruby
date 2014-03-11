@@ -13,7 +13,7 @@ mrb_pp_resource_alloc(mrb_state *mrb)
   struct mrb_pp_resource *resource;
 
   resource = mrb_malloc(mrb, sizeof(struct mrb_pp_resource));
-  resource->resource = 0;
+  MRB_PP_RESOURCE_INIT(resource);
   return resource;
 }
 
@@ -22,7 +22,7 @@ mrb_pp_resource_free(mrb_state *mrb, void *ptr)
 {
   struct mrb_pp_resource *resource = (struct mrb_pp_resource *)ptr;
 
-  PPB(Core)->ReleaseResource(resource->resource);
+  MRB_PP_RESOURCE_RELEASE(resource);
   mrb_free(mrb, resource);
 }
 

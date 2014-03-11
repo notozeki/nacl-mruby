@@ -4,6 +4,7 @@
 #include "ppapi/c/ppb.h"
 #include "ppapi/c/ppb_console.h"
 #include "ppapi/c/ppb_core.h"
+#include "ppapi/c/ppb_image_data.h"
 #include "ppapi/c/ppb_input_event.h"
 #include "ppapi/c/ppb_messaging.h"
 #include "ppapi/c/ppb_url_loader.h"
@@ -17,6 +18,7 @@
 struct PPB_Interface {
   PPB_Console *Console;
   PPB_Core *Core;
+  PPB_ImageData *ImageData;
   PPB_InputEvent *InputEvent;
   PPB_Messaging *Messaging;
   PPB_URLLoader *URLLoader;
