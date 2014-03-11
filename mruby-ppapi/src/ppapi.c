@@ -17,6 +17,7 @@ mrb_ppapi_gem_init(mrb_state *mrb)
   mrb_pp_image_data_init(mrb);
   mrb_pp_input_event_init(mrb);
   mrb_pp_instance_init(mrb);
+  mrb_pp_pointer_init(mrb);
   mrb_pp_var_init(mrb);
   mrb_pp_var_array_init(mrb);
   mrb_pp_var_array_buffer_init(mrb);
