@@ -14,6 +14,7 @@ mrb_ppapi_gem_init(mrb_state *mrb)
   mrb_pp_module = mrb_define_module(mrb, "PP");
 
   mrb_pp_resource_init(mrb); /* must be initialized prior to any PP::Resource's subclasses */
+  mrb_pp_completion_callback_init(mrb);
   mrb_pp_graphics_2d_init(mrb);
   mrb_pp_image_data_init(mrb);
   mrb_pp_input_event_init(mrb);
