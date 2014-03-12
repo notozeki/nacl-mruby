@@ -9,12 +9,6 @@
 
 struct RClass *mrb_pp_completion_callback_class;
 
-struct mrb_pp_completion_callback {
-  struct PP_CompletionCallback cc;
-};
-#define MRB_PP_COMPLETION_CALLBACK_PTR(v) ((struct mrb_pp_completion_callback *)DATA_PTR(v))
-#define MRB_PP_COMPLETION_CALLBACK(v) (MRB_PP_COMPLETION_CALLBACK_PTR(v)->cc)
-
 static struct mrb_pp_completion_callback *
 mrb_pp_completion_callback_alloc(mrb_state *mrb)
 {

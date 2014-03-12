@@ -151,6 +151,21 @@ replace_contents(mrb_state *mrb, mrb_value self)
 }
 
 static mrb_value
+flush(mrb_state *mrb, mrb_value self)
+{
+  mrb_value cc;
+  int32_t ret;
+
+  mrb_get_args(mrb, "o", &cc);
+  if (!mrb_obj_is_instance_of(mrb, cc, mrb_pp_completion_callback_class)) {
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::CompletionCallback object", cc);
+  }
+
+  ret = PPB(Graphics2D)->Flush(MRB_PP_RESOURCE(self), MRB_PP_COMPLETION_CALLBACK(cc));
+  return mrb_fixnum_value(ret);
+}
+
+static mrb_value
 set_scale(mrb_state *mrb, mrb_value self)
 {
   mrb_float scale;
@@ -181,7 +196,7 @@ mrb_pp_graphics_2d_init(mrb_state *mrb)
   mrb_define_method(mrb, mrb_pp_graphics_2d_class, "paint_image_data", paint_image_data, MRB_ARGS_ARG(2,1));
   mrb_define_method(mrb, mrb_pp_graphics_2d_class, "scroll", scroll, MRB_ARGS_REQ(2));
   mrb_define_method(mrb, mrb_pp_graphics_2d_class, "replace_contents", replace_contents, MRB_ARGS_REQ(1));
-  //mrb_define_method(mrb, mrb_pp_graphics_2d_class, "flush", flush, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, mrb_pp_graphics_2d_class, "flush", flush, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, mrb_pp_graphics_2d_class, "set_scale", set_scale, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, mrb_pp_graphics_2d_class, "get_scale", get_scale, MRB_ARGS_NONE());
 }
