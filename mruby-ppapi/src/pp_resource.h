@@ -16,6 +16,9 @@ struct mrb_pp_resource {
 #define MRB_PP_RESOURCE_INIT(res) (((struct mrb_pp_resource *)(res))->resource = 0)
 #define MRB_PP_RESOURCE_RELEASE(res) (PPB(Core)->ReleaseResource(((struct mrb_pp_resource *)(res))->resource))
 
+struct mrb_pp_resource *mrb_pp_resource_alloc(mrb_state *mrb);
+void mrb_pp_resource_free(mrb_state *mrb, void *ptr);
+
 extern struct RClass *mrb_pp_resource_class;
 void mrb_pp_resource_init(mrb_state *mrb);
 

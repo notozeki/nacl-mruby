@@ -7,7 +7,7 @@
 
 struct RClass *mrb_pp_resource_class;
 
-static struct mrb_pp_resource *
+struct mrb_pp_resource *
 mrb_pp_resource_alloc(mrb_state *mrb)
 {
   struct mrb_pp_resource *resource;
@@ -17,7 +17,7 @@ mrb_pp_resource_alloc(mrb_state *mrb)
   return resource;
 }
 
-static void
+void
 mrb_pp_resource_free(mrb_state *mrb, void *ptr)
 {
   struct mrb_pp_resource *resource = (struct mrb_pp_resource *)ptr;
