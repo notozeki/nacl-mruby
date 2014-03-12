@@ -40,7 +40,7 @@ mrb_pp_pointer_free(mrb_state *mrb, void *ptr)
 static struct mrb_data_type mrb_pp_pointer_type =
   {"PP::Pointer", mrb_pp_pointer_free};
 
-static mrb_value
+mrb_value
 mrb_pp_pointer_new(mrb_state *mrb, void *ptr, mrb_int size, mrb_bool is_malloced)
 {
   struct mrb_pp_pointer *pointer;

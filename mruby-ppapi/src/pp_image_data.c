@@ -7,6 +7,7 @@
 #include "ppapi.h"
 
 struct RClass *mrb_pp_image_data_class;
+#define mrb_pp_point_class (mrb_class_get_under(mrb, mrb_pp_module, "Point"))
 #define mrb_pp_size_class (mrb_class_get_under(mrb, mrb_pp_module, "Size"))
 
 struct mrb_pp_image_data {
@@ -33,6 +34,9 @@ mrb_pp_image_data_free(mrb_state *mrb, void *ptr)
 {
   struct mrb_pp_image_data *image_data = (struct mrb_pp_image_data *)ptr;
 
+  if (image_data->data != NULL) {
+    PPB(ImageData)->Unmap(image_data->resource);
+  }
   MRB_PP_RESOURCE_RELEASE(image_data);
   mrb_free(mrb, image_data);
 }
@@ -112,6 +116,38 @@ stride(mrb_state *mrb, mrb_value self)
   return mrb_fixnum_value(image_data->desc.stride);
 }
 
+static mrb_value
+data(mrb_state *mrb, mrb_value self)
+{
+  struct mrb_pp_image_data *image_data;
+  int32_t size;
+
+  image_data = DATA_PTR(self);
+  size = image_data->desc.size.height * image_data->desc.stride;
+  return mrb_pp_pointer_new(mrb, image_data->data, size, 0);
+}
+
+static mrb_value
+get_addr_32(mrb_state *mrb, mrb_value self)
+{
+  struct mrb_pp_image_data *image_data;
+  mrb_value point;
+  int32_t x, y;
+  void *ptr;
+
+  image_data = DATA_PTR(self);
+
+  mrb_get_args(mrb, "o", &point);
+  if (!mrb_obj_is_instance_of(mrb, point, mrb_pp_point_class)) {
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Point object", point);
+  }
+
+  x = mrb_fixnum(mrb_funcall(mrb, point, "x", 0));
+  y = mrb_fixnum(mrb_funcall(mrb, point, "y", 0));
+  ptr = (char *)(image_data->data) + y * image_data->desc.stride + x * sizeof(uint32_t);
+  return mrb_pp_pointer_new(mrb, ptr, sizeof(uint32_t), 0);
+}
+
 void
 mrb_pp_image_data_init(mrb_state *mrb)
 {
@@ -128,6 +164,6 @@ mrb_pp_image_data_init(mrb_state *mrb)
   mrb_define_method(mrb, mrb_pp_image_data_class, "format", format, MRB_ARGS_NONE());
   mrb_define_method(mrb, mrb_pp_image_data_class, "size", size, MRB_ARGS_NONE());
   mrb_define_method(mrb, mrb_pp_image_data_class, "stride", stride, MRB_ARGS_NONE());
-  //mrb_define_method(mrb, mrb_pp_image_data_class, "data", data, MRB_ARGS_NONE());
-  //mrb_define_method(mrb, mrb_pp_image_data_class, "get_addr_32", get_addr_32, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, mrb_pp_image_data_class, "data", data, MRB_ARGS_NONE());
+  mrb_define_method(mrb, mrb_pp_image_data_class, "get_addr_32", get_addr_32, MRB_ARGS_REQ(1));
 }
