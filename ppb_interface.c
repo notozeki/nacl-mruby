@@ -12,6 +12,7 @@ PPB_Interface_Init(PPB_GetInterface get_browser)
   PPB(Graphics2D)     = (PPB_Graphics2D *)get_browser(PPB_GRAPHICS_2D_INTERFACE);
   PPB(ImageData)      = (PPB_ImageData *)get_browser(PPB_IMAGEDATA_INTERFACE);
   PPB(InputEvent)     = (PPB_InputEvent *)get_browser(PPB_INPUT_EVENT_INTERFACE);
+  PPB(Instance)       = (PPB_Instance *)get_browser(PPB_INSTANCE_INTERFACE);
   PPB(Messaging)      = (PPB_Messaging *)get_browser(PPB_MESSAGING_INTERFACE);
   PPB(URLLoader)      = (PPB_URLLoader *)get_browser(PPB_URLLOADER_INTERFACE);
   PPB(URLRequestInfo) = (PPB_URLRequestInfo *)get_browser(PPB_URLREQUESTINFO_INTERFACE);

@@ -7,6 +7,7 @@
 #include "ppapi/c/ppb_graphics_2d.h"
 #include "ppapi/c/ppb_image_data.h"
 #include "ppapi/c/ppb_input_event.h"
+#include "ppapi/c/ppb_instance.h"
 #include "ppapi/c/ppb_messaging.h"
 #include "ppapi/c/ppb_url_loader.h"
 #include "ppapi/c/ppb_url_request_info.h"
@@ -22,6 +23,7 @@ struct PPB_Interface {
   PPB_Graphics2D *Graphics2D;
   PPB_ImageData *ImageData;
   PPB_InputEvent *InputEvent;
+  PPB_Instance *Instance;
   PPB_Messaging *Messaging;
   PPB_URLLoader *URLLoader;
   PPB_URLRequestInfo *URLRequestInfo;

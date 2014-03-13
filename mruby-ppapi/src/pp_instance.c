@@ -9,6 +9,22 @@
 struct RClass *mrb_pp_instance_class;
 
 static mrb_value
+bind_graphics(mrb_state *mrb, mrb_value self)
+{
+  mrb_value graphics;
+  PP_Bool ret;
+
+  mrb_get_args(mrb, "o", &graphics);
+  /* TODO: add type check for PP::Graphics3D if we implement it. */
+  if (!mrb_obj_is_instance_of(mrb, graphics, mrb_pp_graphics_2d_class)) {
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Graphics2D object", graphics);
+  }
+
+  ret = PPB(Instance)->BindGraphics(MRB_PP_INSTANCE(mrb), MRB_PP_RESOURCE(graphics));
+  return (ret == PP_TRUE) ? mrb_true_value() : mrb_false_value();
+}
+
+static mrb_value
 request_input_events(mrb_state *mrb, mrb_value self)
 {
   mrb_int event_classes;
@@ -62,7 +78,7 @@ log_to_console(mrb_state *mrb, mrb_value self)
   }
 
   PPB(Console)->Log(MRB_PP_INSTANCE(mrb), mrb_fixnum(level), MRB_PP_VAR_VAR(value));
-  
+
   return mrb_nil_value();
 }
 
@@ -92,7 +108,7 @@ log_to_console_with_source(mrb_state *mrb, mrb_value self)
 
   PPB(Console)->LogWithSource(MRB_PP_INSTANCE(mrb), mrb_fixnum(level),
 			      MRB_PP_VAR_VAR(source), MRB_PP_VAR_VAR(value));
-  
+
   return mrb_nil_value();
 }
 
@@ -126,7 +142,7 @@ mrb_pp_instance_init(mrb_state *mrb)
   mrb_define_const(mrb, loglevel, "ERROR", mrb_fixnum_value(PP_LOGLEVEL_ERROR));
 
   /* PPB_Instance methods for querying the browser: */
-  //mrb_define_method(mrb, mrb_pp_instance_class, "bind_graphics", bind_graphics, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, mrb_pp_instance_class, "bind_graphics", bind_graphics, MRB_ARGS_REQ(1));
   //mrb_define_method(mrb, mrb_pp_instance_class, "is_full_frame", is_full_frame, MRB_ARGS_NONE());
   mrb_define_method(mrb, mrb_pp_instance_class, "request_input_events", request_input_events, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, mrb_pp_instance_class, "request_filtering_input_events", request_filtering_input_events, MRB_ARGS_REQ(1));
