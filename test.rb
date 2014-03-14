@@ -24,39 +24,8 @@ module LogUtils
   end
 end
 
-class MyInstance < PP::Instance
-  include LogUtils
+include LogUtils
 
-  def initialize(args)
-    request_input_events(PP::InputEvent::Class::MOUSE | PP::InputEvent::Class::KEYBOARD)
-  rescue Exception => e
-    log_exception(e)
-  end
-
-  def did_change_view(view)
-  end
-
-  def did_change_focus(has_focus)
-    # nothing to do
-  end
-
-  def handle_document_load(url_loader)
-    false
-  end
-
-  def handle_input_event(event)
-    log_inspect event
-    true
-  rescue Exception => e
-    log_exception(e)
-  end
-
-  def handle_message(message)
-    log_inspect message.to_obj
-  end
-end
-
-# entry point
-def PP::create_instance(args)
-  MyInstance.new(args)
+def did_create(args)
+  log_inspect self
 end

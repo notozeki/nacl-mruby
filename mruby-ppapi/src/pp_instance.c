@@ -1,12 +1,45 @@
 #include <mruby.h>
+#include <mruby/data.h>
 #include <mruby/string.h>
 
 #include "ppb_interface.h"
-#include "nacl_mruby.h"
 
 #include "ppapi.h"
 
 struct RClass *mrb_pp_instance_class;
+
+static struct mrb_pp_instance *
+mrb_pp_instance_alloc(mrb_state *mrb)
+{
+  struct mrb_pp_instance *instance;
+
+  instance = (struct mrb_pp_instance *)mrb_malloc(mrb, sizeof(struct mrb_pp_instance));
+  instance->instance = 0;
+  return instance;
+}
+
+static void
+mrb_pp_instance_free(mrb_state *mrb, void *ptr)
+{
+  struct mrb_pp_instance *instance = (struct mrb_pp_instance *)ptr;
+
+  mrb_free(mrb, instance);
+}
+
+static mrb_data_type mrb_pp_instance_type =
+  {"PP::Instance", mrb_pp_instance_free};
+
+mrb_value
+mrb_pp_instance_new(mrb_state *mrb, PP_Instance inst)
+{
+  struct mrb_pp_instance *instance;
+  struct RData *data;
+
+  Data_Make_Struct(mrb, mrb_pp_instance_class, struct mrb_pp_instance,
+		   &mrb_pp_instance_type, instance, data);
+  instance->instance = inst;
+  return mrb_obj_value(data);
+}
 
 static mrb_value
 bind_graphics(mrb_state *mrb, mrb_value self)
@@ -20,7 +53,7 @@ bind_graphics(mrb_state *mrb, mrb_value self)
     mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Graphics2D object", graphics);
   }
 
-  ret = PPB(Instance)->BindGraphics(MRB_PP_INSTANCE(mrb), MRB_PP_RESOURCE(graphics));
+  ret = PPB(Instance)->BindGraphics(MRB_PP_INSTANCE(self), MRB_PP_RESOURCE(graphics));
   return (ret == PP_TRUE) ? mrb_true_value() : mrb_false_value();
 }
 
@@ -31,7 +64,7 @@ request_input_events(mrb_state *mrb, mrb_value self)
   int32_t ret;
 
   mrb_get_args(mrb, "i", &event_classes);
-  ret = PPB(InputEvent)->RequestInputEvents(MRB_PP_INSTANCE(mrb), event_classes);
+  ret = PPB(InputEvent)->RequestInputEvents(MRB_PP_INSTANCE(self), event_classes);
   return mrb_fixnum_value(ret);
 }
 
@@ -42,7 +75,7 @@ request_filtering_input_events(mrb_state *mrb, mrb_value self)
   int32_t ret;
 
   mrb_get_args(mrb, "i", &event_classes);
-  ret = PPB(InputEvent)->RequestFilteringInputEvents(MRB_PP_INSTANCE(mrb), event_classes);
+  ret = PPB(InputEvent)->RequestFilteringInputEvents(MRB_PP_INSTANCE(self), event_classes);
   return mrb_fixnum_value(ret);
 }
 
@@ -52,7 +85,7 @@ clear_input_event_request(mrb_state *mrb, mrb_value self)
   mrb_int event_classes;
 
   mrb_get_args(mrb, "i", &event_classes);
-  PPB(InputEvent)->ClearInputEventRequest(MRB_PP_INSTANCE(mrb), event_classes);
+  PPB(InputEvent)->ClearInputEventRequest(MRB_PP_INSTANCE(self), event_classes);
   return mrb_nil_value();
 }
 
@@ -77,7 +110,7 @@ log_to_console(mrb_state *mrb, mrb_value self)
     mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var instance", value);
   }
 
-  PPB(Console)->Log(MRB_PP_INSTANCE(mrb), mrb_fixnum(level), MRB_PP_VAR_VAR(value));
+  PPB(Console)->Log(MRB_PP_INSTANCE(self), mrb_fixnum(level), MRB_PP_VAR_VAR(value));
 
   return mrb_nil_value();
 }
@@ -106,7 +139,7 @@ log_to_console_with_source(mrb_state *mrb, mrb_value self)
     mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var instance", value);
   }
 
-  PPB(Console)->LogWithSource(MRB_PP_INSTANCE(mrb), mrb_fixnum(level),
+  PPB(Console)->LogWithSource(MRB_PP_INSTANCE(self), mrb_fixnum(level),
 			      MRB_PP_VAR_VAR(source), MRB_PP_VAR_VAR(value));
 
   return mrb_nil_value();
@@ -122,7 +155,7 @@ post_message(mrb_state *mrb, mrb_value self)
     mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var instance", message);
   }
 
-  PPB(Messaging)->PostMessage(MRB_PP_INSTANCE(mrb), MRB_PP_VAR_VAR(message));
+  PPB(Messaging)->PostMessage(MRB_PP_INSTANCE(self), MRB_PP_VAR_VAR(message));
 
   return mrb_nil_value();
 }

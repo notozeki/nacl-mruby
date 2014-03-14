@@ -1,7 +1,6 @@
 #include <mruby.h>
 
 /* includes from nacl-mruby */
-#include "nacl_mruby.h"
 #include "ppb_interface.h"
 
 #include "ppapi.h"

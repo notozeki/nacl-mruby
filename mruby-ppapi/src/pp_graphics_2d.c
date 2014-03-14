@@ -3,7 +3,6 @@
 #include <mruby/variable.h>
 
 #include "ppb_interface.h"
-#include "nacl_mruby.h"
 
 #include "ppapi.h"
 
@@ -30,7 +29,7 @@ initialize(mrb_state *mrb, mrb_value self)
 
   mrb_get_args(mrb, "oob", &instance, &size, &is_always_opaque);
   if (mrb_obj_is_kind_of(mrb, instance, mrb_pp_instance_class)) {
-    pp_instance = MRB_PP_INSTANCE(mrb); /* STUB */
+    pp_instance = MRB_PP_INSTANCE(instance);
   }
   else {
     mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a kind of PP::Instance", instance);

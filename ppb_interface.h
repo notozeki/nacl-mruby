@@ -1,6 +1,10 @@
 #ifndef PPB_INTERFACE_H
 #define PPB_INTERFACE_h
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include "ppapi/c/ppb.h"
 #include "ppapi/c/ppb_console.h"
 #include "ppapi/c/ppb_core.h"
@@ -38,5 +42,9 @@ extern struct PPB_Interface ppb_interface;
 #define PPB(name) (ppb_interface.name)
 
 void PPB_Interface_Init(PPB_GetInterface get_browser);
+
+#if defined(__cplusplus)
+} /* extern "C" { */
+#endif
 
 #endif /* PPB_INTERFACE_H */

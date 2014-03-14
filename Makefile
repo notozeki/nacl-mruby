@@ -16,7 +16,7 @@ LIBMRUBY_64 = $(MRUBY)/build/nacl_x86_64/lib/libmruby.a
 LIBMRUBY_ARM = $(MRUBY)/build/nacl_arm/lib/libmruby.a
 
 TARGET = nacl-mruby
-LIBS = $(DEPS) ppapi pthread mruby
+LIBS = $(DEPS) ppapi ppapi_cpp pthread mruby
 
 ifeq ($(CONFIG),Debug)
 DEBUG = -g
@@ -25,7 +25,7 @@ CFLAGS = $(DEBUG) -Wall -I$(MRUBY)/include
 X86_32_LDFLAGS = -L$(MRUBY)/build/nacl_i686/lib
 X86_64_LDFLAGS = -L$(MRUBY)/build/nacl_x86_64/lib
 ARM_LDFLAGS = -L$(MRUBY)/build/nacl_arm/lib
-SOURCES = plugin.c ppb_interface.c mruby_interface.c nacl_mruby.c load_file.c htable.c buffer.c
+SOURCES = plugin.cc remote_file_loader.cc ppb_interface.c nacl_mruby.c
 
 
 # Build mruby libraries

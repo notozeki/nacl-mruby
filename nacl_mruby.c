@@ -1,63 +1,105 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include <mruby.h>
+#include <mruby/compile.h>
+#include <mruby/hash.h>
+#include <mruby/proc.h>
+#include <mruby/string.h>
+#include <ppapi/c/pp_instance.h>
+#include <ppapi/c/ppp_instance.h>
+#include <ppapi/c/ppp_input_event.h>
+#include <ppapi/c/ppp_messaging.h>
 
-#include "ppapi/c/pp_instance.h"
-#include "ppapi/c/ppp_instance.h"
-#include "ppapi/c/ppp_input_event.h"
-#include "ppapi/c/ppp_messaging.h"
-
+#include "ppb_interface.h"
 #include "nacl_mruby.h"
 #include "mruby-ppapi/src/pp_input_event.h"
+#include "mruby-ppapi/src/pp_instance.h"
 #include "mruby-ppapi/src/pp_var.h"
 #include "mruby-ppapi/src/pp_view.h"
 
-static mrb_allocf
-mrb_default_allocf()
+inline static void
+log_to_console(PP_Instance instance, PP_LogLevel level, const char *message)
 {
-  mrb_state *mrb;
-  mrb_allocf allocf;
+  struct PP_Var var;
 
-  mrb = mrb_open();
-  allocf = mrb->allocf;
-  mrb_close(mrb);
+  var = PPB(Var)->VarFromUtf8(message, strlen(message));
+  PPB(Console)->Log(instance, level, var);
+  PPB(Var)->Release(var);
+}
 
-  return allocf;
+inline static void
+log_error(PP_Instance instance, const char *message)
+{
+  log_to_console(instance, PP_LOGLEVEL_ERROR, message);
 }
 
 mrb_state *
 nacl_mruby_init(PP_Instance instance)
 {
   mrb_state *mrb;
-  struct mrb_nacl_ud *ud;
 
-  ud = (struct mrb_nacl_ud *)malloc(sizeof(struct mrb_nacl_ud));
-  if (!ud) return NULL;
-  ud->pp_instance = instance;
-  ud->instance_value = mrb_nil_value();
+  mrb = mrb_open();
+  if (mrb == NULL) {
+    log_error(instance, "Can't initialize mrb interpreter");
+    return NULL;
+  }
 
-  mrb = mrb_open_allocf(mrb_default_allocf(), ud);
+  mrb->top_self = mrb_obj_ptr(mrb_pp_instance_new(mrb, instance));
   return mrb;
 }
 
 void
 nacl_mruby_final(mrb_state *mrb)
 {
-  free(mrb->ud);
   mrb_close(mrb);
 }
 
-mrb_value
-nacl_mruby_create_instance(mrb_state *mrb, mrb_value args)
+void
+nacl_mruby_eval_string(mrb_state *mrb, const char *fname, const char *s)
 {
-  mrb_value pp_module;
+  /* TODO: exception handling */
+  mrbc_context *ctx;
+  struct mrb_parser_state *parser;
+  struct RProc *proc;
 
-  pp_module = mrb_obj_value(mrb_define_module(mrb, "PP"));
-  if (mrb_respond_to(mrb, pp_module, mrb_intern_lit(mrb, "create_instance"))) {
-    return mrb_funcall(mrb, pp_module, "create_instance", 1, args);
+  ctx = mrbc_context_new(mrb);
+  mrbc_filename(mrb, ctx, fname);
+
+  parser = mrb_parse_string(mrb, s, ctx);
+  proc = mrb_generate_code(mrb, parser);
+  mrb_parser_free(parser);
+
+  mrb_run(mrb, proc, mrb_obj_value(mrb_pp_instance_class));
+}
+
+mrb_value
+nacl_mruby_make_args_hash(mrb_state *mrb, uint32_t argc,
+			  const char *argn[], const char *argv[])
+{
+  mrb_value args_hash;
+  uint32_t i;
+
+  args_hash = mrb_hash_new_capa(mrb, argc);
+  for (i = 0; i < argc; i++) {
+    mrb_value name, value;
+    name = mrb_str_new_cstr(mrb, argn[i]);
+    value = mrb_str_new_cstr(mrb, argv[i]);
+    mrb_hash_set(mrb, args_hash, name, value);
   }
-  else {
-    return mrb_nil_value();
+
+  return args_hash;
+}
+
+void
+nacl_mruby_did_create(mrb_state *mrb, mrb_value args)
+{
+  /* TODO: exception handling */
+  mrb_value inst;
+
+  inst = mrb_top_self(mrb);
+  if (mrb_respond_to(mrb, inst, mrb_intern_lit(mrb, "did_create"))) {
+    mrb_funcall(mrb, inst, "did_create", 1, args);
   }
 }
 
@@ -65,15 +107,6 @@ void
 nacl_mruby_did_change_view(mrb_state *mrb, PP_Resource view)
 {
   /* TODO */
-  mrb_value v;
-
-  if (mrb_nil_p(MRB_INSTANCE_VALUE(mrb))) return;
-
-  v = mrb_pp_view_new_raw(mrb, view);
-  if (mrb_respond_to(mrb, MRB_INSTANCE_VALUE(mrb),
-  		     mrb_intern_lit(mrb, "did_change_view"))) {
-    mrb_funcall(mrb, MRB_INSTANCE_VALUE(mrb), "did_change_view", 1, v);
-  }
 }
 
 void
@@ -93,27 +126,11 @@ PP_Bool
 nacl_mruby_handle_input_event(mrb_state *mrb, PP_Resource input_event)
 {
   /* TODO */
-  mrb_value v, ret;
-
-  if (mrb_nil_p(MRB_INSTANCE_VALUE(mrb))) return PP_FALSE;
-
-  v = mrb_pp_input_event_new_raw(mrb, input_event);
-  if (mrb_respond_to(mrb, MRB_INSTANCE_VALUE(mrb),
-  		     mrb_intern_lit(mrb, "handle_input_event"))) {
-    ret = mrb_funcall(mrb, MRB_INSTANCE_VALUE(mrb), "handle_input_event", 1, v);
-  }
-  return mrb_test(ret) ? PP_TRUE : PP_FALSE;
+  return PP_FALSE;
 }
 
 void
 nacl_mruby_handle_message(mrb_state *mrb, struct PP_Var message)
 {
   /* TODO */
-  mrb_value msg;
-
-  msg = mrb_pp_var_new_raw(mrb, message);
-  if (mrb_respond_to(mrb, MRB_INSTANCE_VALUE(mrb),
-		     mrb_intern_lit(mrb, "handle_message"))) {
-    mrb_funcall(mrb, MRB_INSTANCE_VALUE(mrb), "handle_message", 1, msg);
-  }
 }
