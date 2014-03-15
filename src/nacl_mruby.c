@@ -14,10 +14,10 @@
 
 #include "ppb_interface.h"
 #include "nacl_mruby.h"
-#include "mruby-ppapi/src/pp_input_event.h"
-#include "mruby-ppapi/src/pp_instance.h"
-#include "mruby-ppapi/src/pp_var.h"
-#include "mruby-ppapi/src/pp_view.h"
+#include "../mruby-ppapi/src/pp_input_event.h"
+#include "../mruby-ppapi/src/pp_instance.h"
+#include "../mruby-ppapi/src/pp_var.h"
+#include "../mruby-ppapi/src/pp_view.h"
 
 inline static void
 log_to_console(PP_Instance instance, PP_LogLevel level, const char *message)
