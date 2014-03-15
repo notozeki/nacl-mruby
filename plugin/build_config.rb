@@ -76,8 +76,8 @@ end
 class NaClConfig
   SDK_ROOT = ENV['NACL_SDK_ROOT']
 
-  def initialize(osname, toolchain)
-    @osname = osname
+  def initialize(toolchain)
+    @osname = `python #{SDK_ROOT}/tools/getos.py`.chomp
     @toolchain = toolchain
   end
 
@@ -107,7 +107,7 @@ class NaClConfig
   end
 end
 
-nacl_conf = NaClConfig.new('mac', 'newlib')
+nacl_conf = NaClConfig.new('newlib')
 
 %w(i686 x86_64 arm).each do |arch|
   MRuby::CrossBuild.new("nacl_#{arch}") do |conf|
@@ -121,6 +121,8 @@ nacl_conf = NaClConfig.new('mac', 'newlib')
 
     conf.archiver.command = nacl_conf.archiver(arch)
 
+    conf.gem 'mrbgems/mruby-math'
+    conf.gem 'mrbgems/mruby-random'
     conf.gem '../mruby-ppapi' do |gemconf|
       gemconf.cc.include_paths << nacl_conf.include
       gemconf.cc.include_paths << '../include'
