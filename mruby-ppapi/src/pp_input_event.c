@@ -34,9 +34,9 @@ get_modifiers(mrb_state *mrb, mrb_value self)
 }
 
 mrb_value
-mrb_pp_input_event_new_raw(mrb_state *mrb, PP_Resource input_event)
+mrb_pp_input_event_new(mrb_state *mrb, PP_Resource input_event)
 {
-  return mrb_pp_resource_new_raw(mrb, mrb_pp_input_event_class, input_event);
+  return mrb_pp_resource_new(mrb, mrb_pp_input_event_class, input_event);
 }
 
 void

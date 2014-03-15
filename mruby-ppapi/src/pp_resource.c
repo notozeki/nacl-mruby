@@ -48,7 +48,7 @@ is_null(mrb_state *mrb, mrb_value self)
 }
 
 mrb_value
-mrb_pp_resource_new_raw(mrb_state *mrb, struct RClass *klass, PP_Resource resource)
+mrb_pp_resource_new(mrb_state *mrb, struct RClass *klass, PP_Resource resource)
 {
   mrb_value ret;
 

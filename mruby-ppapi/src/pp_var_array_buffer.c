@@ -15,10 +15,10 @@ initialize(mrb_state *mrb, mrb_value self)
   mrb_value var;
 
   if (mrb_get_args(mrb, "|o", &var) == 0) {
-    var = mrb_pp_var_new_raw(mrb, PPB(VarArrayBuffer)->Create(0));
+    var = mrb_pp_var_new(mrb, PPB(VarArrayBuffer)->Create(0));
   }
   else if (mrb_fixnum_p(var)) {
-    var = mrb_pp_var_new_raw(mrb, PPB(VarArrayBuffer)->Create(mrb_fixnum(var)));
+    var = mrb_pp_var_new(mrb, PPB(VarArrayBuffer)->Create(mrb_fixnum(var)));
   }
   else if (!mrb_obj_is_instance_of(mrb, var, mrb_pp_var_class)) {
     mrb_raise(mrb, E_TYPE_ERROR, "not a Fixnum or PP::Var instance");

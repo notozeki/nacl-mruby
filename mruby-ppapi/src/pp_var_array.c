@@ -14,7 +14,7 @@ initialize(mrb_state *mrb, mrb_value self)
   mrb_value var;
 
   if (mrb_get_args(mrb, "|o", &var) == 0) {
-    var = mrb_pp_var_new_raw(mrb, PPB(VarArray)->Create());
+    var = mrb_pp_var_new(mrb, PPB(VarArray)->Create());
   }
   else if (!mrb_obj_is_instance_of(mrb, var, mrb_pp_var_class)) {
     mrb_raise(mrb, E_TYPE_ERROR, "not a PP::Var instance");
@@ -38,7 +38,7 @@ get(mrb_state *mrb, mrb_value self)
   mrb_get_args(mrb, "i", &index);
 
   ret = PPB(VarArray)->Get(MRB_PP_VAR_VAR(var), mrb_fixnum(index));
-  return mrb_pp_var_new_raw(mrb, ret);
+  return mrb_pp_var_new(mrb, ret);
 }
 
 static mrb_value

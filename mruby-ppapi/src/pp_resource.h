@@ -22,6 +22,6 @@ void mrb_pp_resource_free(mrb_state *mrb, void *ptr);
 extern struct RClass *mrb_pp_resource_class;
 void mrb_pp_resource_init(mrb_state *mrb);
 
-mrb_value mrb_pp_resource_new_raw(mrb_state *mrb, struct RClass *klass, PP_Resource resource);
+mrb_value mrb_pp_resource_new(mrb_state *mrb, struct RClass *klass, PP_Resource resource);
 
 #endif /* MRUBY_PPAPI_PP_RESOURCE_H */

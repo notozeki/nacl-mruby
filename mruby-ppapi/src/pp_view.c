@@ -86,9 +86,9 @@ get_css_scale(mrb_state *mrb, mrb_value self)
 }
 
 mrb_value
-mrb_pp_view_new_raw(mrb_state *mrb, PP_Resource view)
+mrb_pp_view_new(mrb_state *mrb, PP_Resource view)
 {
-  return mrb_pp_resource_new_raw(mrb, mrb_pp_view_class, view);
+  return mrb_pp_resource_new(mrb, mrb_pp_view_class, view);
 }
 
 void

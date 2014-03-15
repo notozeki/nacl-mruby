@@ -14,6 +14,6 @@ struct mrb_pp_var {
 extern struct RClass *mrb_pp_var_class;
 void mrb_pp_var_init(mrb_state *mrb);
 
-mrb_value mrb_pp_var_new_raw(mrb_state *mrb, struct PP_Var var);
+mrb_value mrb_pp_var_new(mrb_state *mrb, struct PP_Var var);
 
 #endif /* MRUBY_PPAPI_PP_VAR_H */

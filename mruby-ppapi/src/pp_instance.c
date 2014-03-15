@@ -8,16 +8,6 @@
 
 struct RClass *mrb_pp_instance_class;
 
-static struct mrb_pp_instance *
-mrb_pp_instance_alloc(mrb_state *mrb)
-{
-  struct mrb_pp_instance *instance;
-
-  instance = (struct mrb_pp_instance *)mrb_malloc(mrb, sizeof(struct mrb_pp_instance));
-  instance->instance = 0;
-  return instance;
-}
-
 static void
 mrb_pp_instance_free(mrb_state *mrb, void *ptr)
 {

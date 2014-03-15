@@ -7,6 +7,6 @@
 extern struct RClass *mrb_pp_view_class;
 void mrb_pp_view_init(mrb_state *mrb);
 
-mrb_value mrb_pp_view_new_raw(mrb_state *mrb, PP_Resource view);
+mrb_value mrb_pp_view_new(mrb_state *mrb, PP_Resource view);
 
 #endif /* MRUBY_PPAPI_PP_VIEW_H */
