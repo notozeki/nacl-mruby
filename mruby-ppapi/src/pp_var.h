@@ -9,7 +9,10 @@ struct mrb_pp_var {
   struct PP_Var var;
 };
 #define MRB_PP_VAR_PTR(v) ((struct mrb_pp_var *)DATA_PTR(v))
-#define MRB_PP_VAR_VAR(v) (MRB_PP_VAR_PTR(v)->var)
+#define MRB_PP_VAR(v) (MRB_PP_VAR_PTR(v)->var)
+
+struct mrb_pp_var *mrb_pp_var_alloc(mrb_state *mrb);
+void mrb_pp_var_free(mrb_state *mrb, void *ptr);
 
 extern struct RClass *mrb_pp_var_class;
 void mrb_pp_var_init(mrb_state *mrb);

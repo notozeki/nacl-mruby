@@ -28,4 +28,9 @@ include LogUtils
 
 def did_create(args)
   log_inspect self
+  event = PP::VarDictionary.new
+  event.set(PP::Var.new('event'), PP::Var.new('DidCreate'))
+  message = PP::VarDictionary.new
+  message.set(PP::Var.new('nacl-mruby'), event)
+  post_message message
 end

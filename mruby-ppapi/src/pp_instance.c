@@ -96,11 +96,11 @@ log_to_console(mrb_state *mrb, mrb_value self)
     mrb_raise(mrb, E_ARGUMENT_ERROR, "invalid level");
     break;
   }
-  if (!mrb_obj_is_instance_of(mrb, value, mrb_pp_var_class)) {
-    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var instance", value);
+  if (!mrb_obj_is_kind_of(mrb, value, mrb_pp_var_class)) {
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var object", value);
   }
 
-  PPB(Console)->Log(MRB_PP_INSTANCE(self), mrb_fixnum(level), MRB_PP_VAR_VAR(value));
+  PPB(Console)->Log(MRB_PP_INSTANCE(self), mrb_fixnum(level), MRB_PP_VAR(value));
 
   return mrb_nil_value();
 }
@@ -122,15 +122,15 @@ log_to_console_with_source(mrb_state *mrb, mrb_value self)
     mrb_raise(mrb, E_ARGUMENT_ERROR, "invalid level");
     break;
   }
-  if (!mrb_obj_is_instance_of(mrb, source, mrb_pp_var_class)) {
-    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var instance", source);
+  if (!mrb_obj_is_kind_of(mrb, source, mrb_pp_var_class)) {
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var object", source);
   }
-  if (!mrb_obj_is_instance_of(mrb, value, mrb_pp_var_class)) {
-    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var instance", value);
+  if (!mrb_obj_is_kind_of(mrb, value, mrb_pp_var_class)) {
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var object", value);
   }
 
   PPB(Console)->LogWithSource(MRB_PP_INSTANCE(self), mrb_fixnum(level),
-			      MRB_PP_VAR_VAR(source), MRB_PP_VAR_VAR(value));
+			      MRB_PP_VAR(source), MRB_PP_VAR(value));
 
   return mrb_nil_value();
 }
@@ -141,11 +141,11 @@ post_message(mrb_state *mrb, mrb_value self)
   mrb_value message;
 
   mrb_get_args(mrb, "o", &message);
-  if (!mrb_obj_is_instance_of(mrb, message, mrb_pp_var_class)) {
-    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var instance", message);
+  if (!mrb_obj_is_kind_of(mrb, message, mrb_pp_var_class)) {
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var object", message);
   }
 
-  PPB(Messaging)->PostMessage(MRB_PP_INSTANCE(self), MRB_PP_VAR_VAR(message));
+  PPB(Messaging)->PostMessage(MRB_PP_INSTANCE(self), MRB_PP_VAR(message));
 
   return mrb_nil_value();
 }

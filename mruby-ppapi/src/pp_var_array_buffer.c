@@ -9,62 +9,66 @@
 
 struct RClass *mrb_pp_var_array_buffer_class;
 
+static mrb_data_type mrb_pp_var_array_buffer_type =
+  {"PP::VarArrayBuffer", mrb_pp_var_free};
+
 static mrb_value
 initialize(mrb_state *mrb, mrb_value self)
 {
   mrb_value var;
 
-  if (mrb_get_args(mrb, "|o", &var) == 0) {
-    var = mrb_pp_var_new(mrb, PPB(VarArrayBuffer)->Create(0));
-  }
-  else if (mrb_fixnum_p(var)) {
-    var = mrb_pp_var_new(mrb, PPB(VarArrayBuffer)->Create(mrb_fixnum(var)));
-  }
-  else if (!mrb_obj_is_instance_of(mrb, var, mrb_pp_var_class)) {
-    mrb_raise(mrb, E_TYPE_ERROR, "not a Fixnum or PP::Var instance");
-  }
-  else if (!mrb_test(mrb_funcall(mrb, var, "is_array_buffer", 0))) {
-    mrb_raise(mrb, E_TYPE_ERROR, "not a array buffer value");
+  DATA_TYPE(self) = &mrb_pp_var_array_buffer_type;
+  DATA_PTR(self) = mrb_pp_var_alloc(mrb);
+
+  switch (mrb_get_args(mrb, "|o", &var)) {
+  case 0:
+    MRB_PP_VAR(self) = PPB(VarArrayBuffer)->Create(0);
+    break;
+  case 1:
+    if (mrb_fixnum_p(var)) {
+      MRB_PP_VAR(self) = PPB(VarArrayBuffer)->Create(mrb_fixnum(var));
+      break;
+    }
+    else if (!mrb_obj_is_kind_of(mrb, var, mrb_pp_var_class)) {
+      mrb_raise(mrb, E_TYPE_ERROR, "argument must be a Fixnum or PP::Var");
+    }
+    else if (!mrb_test(mrb_funcall(mrb, var, "is_array_buffer", 0))) {
+      mrb_raisef(mrb, E_TYPE_ERROR, "%S is not an array buffer value", var);
+    }
+    MRB_PP_VAR(self) = MRB_PP_VAR(var);
+    PPB(Var)->AddRef(MRB_PP_VAR(self));
+    break;
+  default:
+    mrb_raise(mrb, E_ARGUMENT_ERROR, "wrong number of arguments");
   }
 
-  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "var"), var);
   return self;
 }
 
 static mrb_value
 byte_length(mrb_state *mrb, mrb_value self)
 {
-  mrb_value var;
   uint32_t ret;
 
-  var = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "var"));
-
-  PPB(VarArrayBuffer)->ByteLength(MRB_PP_VAR_VAR(var), &ret);
-  if (FIXABLE(ret)) {
-    return mrb_fixnum_value(ret);
-  }
-  else {
-    return mrb_float_value(mrb, ret);
-  }
+  PPB(VarArrayBuffer)->ByteLength(MRB_PP_VAR(self), &ret);
+  return mrb_fixnum_value(ret);
 }
 
 static mrb_value
 map(mrb_state *mrb, mrb_value self)
 {
-  mrb_value var, map;
+  mrb_value map;
   uint32_t len;
   char *ptr;
-
-  var = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "var"));
 
   map = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "map"));
   if (!mrb_nil_p(map)) {
     return map;
   }
 
-  PPB(VarArrayBuffer)->ByteLength(MRB_PP_VAR_VAR(var), &len);
-  ptr = PPB(VarArrayBuffer)->Map(MRB_PP_VAR_VAR(var));
-  map = mrb_str_new(mrb, ptr, len);
+  PPB(VarArrayBuffer)->ByteLength(MRB_PP_VAR(self), &len);
+  ptr = PPB(VarArrayBuffer)->Map(MRB_PP_VAR(self));
+  map = mrb_pp_pointer_new(mrb, ptr, len, 0);
 
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "map"), map);
   return map;
@@ -73,19 +77,14 @@ map(mrb_state *mrb, mrb_value self)
 static mrb_value
 unmap(mrb_state *mrb, mrb_value self)
 {
-  mrb_value var, map;
-
-  var = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "var"));
+  mrb_value map;
 
   map = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "map"));
   if (mrb_nil_p(map)) {
-    return mrb_nil_value();
+    mrb_raise(mrb, E_RUNTIME_ERROR, "unmap() called before map()");
   }
 
-  /* clear string */
-  RSTRING_PTR(map) = NULL;
-  RSTRING_LEN(map) = 0;
-  PPB(VarArrayBuffer)->Unmap(MRB_PP_VAR_VAR(var));
+  PPB(VarArrayBuffer)->Unmap(MRB_PP_VAR(self));
 
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "map"), mrb_nil_value());
   return mrb_nil_value();
@@ -94,7 +93,7 @@ unmap(mrb_state *mrb, mrb_value self)
 void
 mrb_pp_var_array_buffer_init(mrb_state *mrb)
 {
-  mrb_pp_var_array_buffer_class = mrb_define_class_under(mrb, mrb_pp_module, "VarArrayBuffer", mrb->object_class);
+  mrb_pp_var_array_buffer_class = mrb_define_class_under(mrb, mrb_pp_module, "VarArrayBuffer", mrb_pp_var_class);
 
   mrb_define_method(mrb, mrb_pp_var_array_buffer_class, "initialize", initialize, MRB_ARGS_OPT(1));
   mrb_define_method(mrb, mrb_pp_var_array_buffer_class, "byte_length", byte_length, MRB_ARGS_NONE());

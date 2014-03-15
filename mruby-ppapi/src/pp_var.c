@@ -14,7 +14,7 @@
 
 struct RClass *mrb_pp_var_class;
 
-static struct mrb_pp_var *
+struct mrb_pp_var *
 mrb_pp_var_alloc(mrb_state *mrb)
 {
   struct mrb_pp_var *var;
@@ -25,7 +25,7 @@ mrb_pp_var_alloc(mrb_state *mrb)
   return var;
 }
 
-static void
+void
 mrb_pp_var_free(mrb_state *mrb, void *ptr)
 {
   struct mrb_pp_var *var = (struct mrb_pp_var *)ptr;
@@ -36,6 +36,18 @@ mrb_pp_var_free(mrb_state *mrb, void *ptr)
 
 static struct mrb_data_type mrb_pp_var_type =
   {"PP::Var", mrb_pp_var_free};
+
+mrb_value
+mrb_pp_var_new(mrb_state *mrb, struct PP_Var var)
+{
+  struct mrb_pp_var *var_ptr;
+  struct RData *data;
+
+  Data_Make_Struct(mrb, mrb_pp_var_class, struct mrb_pp_var,
+		   &mrb_pp_var_type, var_ptr, data);
+  var_ptr->var = var;
+  return mrb_obj_value(data);
+}
 
 static mrb_value
 initialize(mrb_state *mrb, mrb_value self)
@@ -88,7 +100,7 @@ initialize(mrb_state *mrb, mrb_value self)
 static mrb_value
 is_undefined(mrb_state *mrb, mrb_value self)
 {
-  if (MRB_PP_VAR_VAR(self).type == PP_VARTYPE_UNDEFINED) {
+  if (MRB_PP_VAR(self).type == PP_VARTYPE_UNDEFINED) {
     return mrb_true_value();
   }
   else {
@@ -99,7 +111,7 @@ is_undefined(mrb_state *mrb, mrb_value self)
 static mrb_value
 is_null(mrb_state *mrb, mrb_value self)
 {
-  if (MRB_PP_VAR_VAR(self).type == PP_VARTYPE_NULL) {
+  if (MRB_PP_VAR(self).type == PP_VARTYPE_NULL) {
     return mrb_true_value();
   }
   else {
@@ -110,7 +122,7 @@ is_null(mrb_state *mrb, mrb_value self)
 static mrb_value
 is_bool(mrb_state *mrb, mrb_value self)
 {
-  if (MRB_PP_VAR_VAR(self).type == PP_VARTYPE_BOOL) {
+  if (MRB_PP_VAR(self).type == PP_VARTYPE_BOOL) {
     return mrb_true_value();
   }
   else {
@@ -121,7 +133,7 @@ is_bool(mrb_state *mrb, mrb_value self)
 static mrb_value
 is_string(mrb_state *mrb, mrb_value self)
 {
-  if (MRB_PP_VAR_VAR(self).type == PP_VARTYPE_STRING) {
+  if (MRB_PP_VAR(self).type == PP_VARTYPE_STRING) {
     return mrb_true_value();
   }
   else {
@@ -132,7 +144,7 @@ is_string(mrb_state *mrb, mrb_value self)
 static mrb_value
 is_object(mrb_state *mrb, mrb_value self)
 {
-  if (MRB_PP_VAR_VAR(self).type == PP_VARTYPE_OBJECT) {
+  if (MRB_PP_VAR(self).type == PP_VARTYPE_OBJECT) {
     return mrb_true_value();
   }
   else {
@@ -143,7 +155,7 @@ is_object(mrb_state *mrb, mrb_value self)
 static mrb_value
 is_array(mrb_state *mrb, mrb_value self)
 {
-  if (MRB_PP_VAR_VAR(self).type == PP_VARTYPE_ARRAY) {
+  if (MRB_PP_VAR(self).type == PP_VARTYPE_ARRAY) {
     return mrb_true_value();
   }
   else {
@@ -154,7 +166,7 @@ is_array(mrb_state *mrb, mrb_value self)
 static mrb_value
 is_dictionary(mrb_state *mrb, mrb_value self)
 {
-  if (MRB_PP_VAR_VAR(self).type == PP_VARTYPE_DICTIONARY) {
+  if (MRB_PP_VAR(self).type == PP_VARTYPE_DICTIONARY) {
     return mrb_true_value();
   }
   else {
@@ -165,7 +177,7 @@ is_dictionary(mrb_state *mrb, mrb_value self)
 static mrb_value
 is_int(mrb_state *mrb, mrb_value self)
 {
-  if (MRB_PP_VAR_VAR(self).type == PP_VARTYPE_INT32) {
+  if (MRB_PP_VAR(self).type == PP_VARTYPE_INT32) {
     return mrb_true_value();
   }
   else {
@@ -176,7 +188,7 @@ is_int(mrb_state *mrb, mrb_value self)
 static mrb_value
 is_double(mrb_state *mrb, mrb_value self)
 {
-  if (MRB_PP_VAR_VAR(self).type == PP_VARTYPE_DOUBLE) {
+  if (MRB_PP_VAR(self).type == PP_VARTYPE_DOUBLE) {
     return mrb_true_value();
   }
   else {
@@ -187,8 +199,8 @@ is_double(mrb_state *mrb, mrb_value self)
 static mrb_value
 is_number(mrb_state *mrb, mrb_value self)
 {
-  if (MRB_PP_VAR_VAR(self).type == PP_VARTYPE_INT32 ||
-      MRB_PP_VAR_VAR(self).type == PP_VARTYPE_DOUBLE) {
+  if (MRB_PP_VAR(self).type == PP_VARTYPE_INT32 ||
+      MRB_PP_VAR(self).type == PP_VARTYPE_DOUBLE) {
     return mrb_true_value();
   }
   else {
@@ -199,7 +211,7 @@ is_number(mrb_state *mrb, mrb_value self)
 static mrb_value
 is_array_buffer(mrb_state *mrb, mrb_value self)
 {
-  if (MRB_PP_VAR_VAR(self).type == PP_VARTYPE_ARRAY_BUFFER) {
+  if (MRB_PP_VAR(self).type == PP_VARTYPE_ARRAY_BUFFER) {
     return mrb_true_value();
   }
   else {
@@ -210,7 +222,7 @@ is_array_buffer(mrb_state *mrb, mrb_value self)
 static mrb_value
 as_bool(mrb_state *mrb, mrb_value self)
 {
-  struct PP_Var var = MRB_PP_VAR_VAR(self);
+  struct PP_Var var = MRB_PP_VAR(self);
 
   if (!mrb_test(mrb_funcall(mrb, self, "is_bool", 0))) {
     mrb_raise(mrb, E_TYPE_ERROR, "not a bool value");
@@ -229,7 +241,7 @@ as_bool(mrb_state *mrb, mrb_value self)
 static mrb_value
 as_int(mrb_state *mrb, mrb_value self)
 {
-  struct PP_Var var = MRB_PP_VAR_VAR(self);
+  struct PP_Var var = MRB_PP_VAR(self);
   int32_t num;
 
   if (!mrb_test(mrb_funcall(mrb, self, "is_number", 0))) {
@@ -260,7 +272,7 @@ as_double(mrb_state *mrb, mrb_value self)
 static mrb_value
 as_string(mrb_state *mrb, mrb_value self)
 {
-  struct PP_Var var = MRB_PP_VAR_VAR(self);
+  struct PP_Var var = MRB_PP_VAR(self);
   const char *s;
   uint32_t len;
 
@@ -270,16 +282,6 @@ as_string(mrb_state *mrb, mrb_value self)
 
   s = PPB(Var)->VarToUtf8(var, &len);
   return mrb_str_new(mrb, s, len);
-}
-
-mrb_value
-mrb_pp_var_new(mrb_state *mrb, struct PP_Var var)
-{
-  mrb_value ret;
-
-  ret = mrb_obj_new(mrb, mrb_pp_var_class, 0, NULL);
-  MRB_PP_VAR_VAR(ret) = var;
-  return ret;
 }
 
 void
