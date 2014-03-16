@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>nacl-mruby Plotting Mandelbrot Set Example</title>
+
+  <script src="common.js"></script>
+  <script src="simple.js"></script>
+
+  <style>
+    #listener embed {
+        border: 1px solid gray;
+    }
+  </style>
+</head>
+
+<body data-name="nacl-mruby" data-width="300" data-height="300"
+      data-tools="newlib" data-configs="Release" data-path="{tc}/{config}"
+      data-attrs="ruby-src=mandelbrot.rb">
+  <h1>nacl-mruby Plotting Mandelbrot Set Example</h1>
+
+  <h2>Plugin Area</h2>
+  <div id="listener"></div>
+
+  <h2>Output</h2>
+  <pre id="log"></pre>
+</body>
+</html>
