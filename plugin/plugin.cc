@@ -1,4 +1,5 @@
 #include <cstring> /* strcmp */
+#include <queue>
 
 #include <mruby.h>
 #include <ppapi/cpp/instance.h>
@@ -34,6 +35,8 @@ private:
   mrb_state *mrb_;
   mrb_value args_hash_;
   std::string url_;
+  bool is_instance_created_;
+  std::queue<pp::View> view_queue_;
 };
 
 void
@@ -42,6 +45,12 @@ OnLoad(const std::string &str, void *data)
   NaClMRubyInstance *inst = static_cast<NaClMRubyInstance *>(data);
   nacl_mruby_eval_string(inst->mrb_, inst->url_.c_str(), str.c_str());
   nacl_mruby_did_create(inst->mrb_, inst->args_hash_);
+  inst->is_instance_created_ = true;
+  while (!inst->view_queue_.empty()) {
+    pp::View view = inst->view_queue_.front();
+    nacl_mruby_did_change_view(inst->mrb_, view.pp_resource());
+    inst->view_queue_.pop();
+  }
 }
 
 bool
@@ -63,6 +72,10 @@ NaClMRubyInstance::Init(uint32_t argc, const char *argn[], const char *argv[])
 void
 NaClMRubyInstance::DidChangeView(const pp::View &view)
 {
+  if (!is_instance_created_) {
+    view_queue_.push(view);
+    return;
+  }
   nacl_mruby_did_change_view(mrb_, view.pp_resource());
 }
 
