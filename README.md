@@ -44,7 +44,7 @@ Currently there are two examples:
 * examples/simple
 * examples/mandelbrot
 
-To run an example, change directory to the example, and run `make` and `make run`.
+To run an example, change directory to the example directory, and run `make` and `make run`.
 ```bash
 $ cd ../examples/mandelbrot
 $ make
@@ -52,6 +52,9 @@ $ make run
 ```
 
 Now http server is running in the local, access `localhost:5103` from Google Chrome browser.
+
+### 4. Write your application
+(Coming soon...)
 
 
 ## License
