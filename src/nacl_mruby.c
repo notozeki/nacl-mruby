@@ -55,6 +55,40 @@ handle_exception(mrb_state *mrb)
   return 0;
 }
 
+static mrb_value
+include_main(mrb_state *mrb, mrb_value self)
+{
+  mrb_int argc;
+  mrb_value *argv;
+  struct RClass *klass;
+  mrb_sym mid = mrb_intern_lit(mrb, "include");
+
+  mrb_get_args(mrb, "*", &argv, &argc);
+
+  klass = mrb_obj_class(mrb, self);
+  return mrb_funcall_argv(mrb, mrb_obj_value(klass), mid, argc, argv);
+}
+
+static mrb_value
+do_nothing(mrb_state *mrb, mrb_value self)
+{
+  /* empty */
+  return mrb_nil_value();
+}
+
+static struct RObject *
+create_top_self_instance(mrb_state *mrb, PP_Instance instance)
+{
+  struct RObject *inst;
+
+  inst = mrb_obj_ptr(mrb_pp_instance_new(mrb, instance));
+  mrb_define_singleton_method(mrb, inst, "include", include_main, MRB_ARGS_REST());
+  mrb_define_singleton_method(mrb, inst, "public", do_nothing, MRB_ARGS_REST());
+  mrb_define_singleton_method(mrb, inst, "private", do_nothing, MRB_ARGS_REST());
+  mrb_define_singleton_method(mrb, inst, "protected", do_nothing, MRB_ARGS_REST());
+  return inst;
+}
+
 mrb_state *
 nacl_mruby_init(PP_Instance instance)
 {
@@ -66,7 +100,7 @@ nacl_mruby_init(PP_Instance instance)
     return NULL;
   }
 
-  mrb->top_self = mrb_obj_ptr(mrb_pp_instance_new(mrb, instance));
+  mrb->top_self = create_top_self_instance(mrb, instance);
   return mrb;
 }
 
@@ -99,7 +133,7 @@ nacl_mruby_eval_string(mrb_state *mrb, const char *fname, const char *s)
   }
   proc = mrb_generate_code(mrb, parser);
 
-  mrb_run(mrb, proc, mrb_obj_value(mrb_pp_instance_class));
+  mrb_run(mrb, proc, mrb_top_self(mrb));
 
  end:
   mrb_parser_free(parser);
