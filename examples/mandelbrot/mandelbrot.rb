@@ -63,8 +63,8 @@ class MandelbrotSet
   end
 end
 
-module PlottingMandelbrotSet
-  def did_create(args)
+class PlottingMandelbrotSet < PP::Instance
+  def initialize(args)
     @size = PP::Size.new(0, 0)
   end
 
@@ -113,4 +113,4 @@ module PlottingMandelbrotSet
   end
 end
 
-self.extend(PlottingMandelbrotSet)
+PP::InstanceClass = PlottingMandelbrotSet

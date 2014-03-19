@@ -121,8 +121,8 @@ nacl_conf = NaClConfig.new('newlib')
 
     conf.archiver.command = nacl_conf.archiver(arch)
 
-    conf.gem 'mrbgems/mruby-math'
-    conf.gem 'mrbgems/mruby-random'
+    conf.gem "#{root}/mrbgems/mruby-math"
+    conf.gem "#{root}/mrbgems/mruby-random"
     conf.gem '../mruby-ppapi' do |gemconf|
       gemconf.cc.include_paths << nacl_conf.include
       gemconf.cc.include_paths << '../include'

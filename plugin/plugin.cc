@@ -16,7 +16,8 @@
 class NaClMRubyInstance : public pp::Instance {
 public:
   explicit NaClMRubyInstance(PP_Instance instance)
-    : pp::Instance(instance)
+    : pp::Instance(instance),
+      is_instance_created_(false)
   {
     mrb_ = nacl_mruby_init(instance);
   }
@@ -33,6 +34,7 @@ private:
   friend void OnLoad(const std::string &str, void *data);
 
   mrb_state *mrb_;
+  mrb_value inst_;
   mrb_value args_hash_;
   std::string url_;
   bool is_instance_created_;
@@ -44,13 +46,15 @@ OnLoad(const std::string &str, void *data)
 {
   NaClMRubyInstance *inst = static_cast<NaClMRubyInstance *>(data);
   nacl_mruby_eval_string(inst->mrb_, inst->url_.c_str(), str.c_str());
-  nacl_mruby_did_create(inst->mrb_, inst->args_hash_);
-  inst->is_instance_created_ = true;
+  inst->inst_ = nacl_mruby_create_instance(inst->mrb_, inst->pp_instance(),
+					   inst->args_hash_);
+
   while (!inst->view_queue_.empty()) {
     pp::View view = inst->view_queue_.front();
-    nacl_mruby_did_change_view(inst->mrb_, view.pp_resource());
+    nacl_mruby_did_change_view(inst->mrb_, inst->inst_, view.pp_resource());
     inst->view_queue_.pop();
   }
+  inst->is_instance_created_ = true;
 }
 
 bool
@@ -76,31 +80,31 @@ NaClMRubyInstance::DidChangeView(const pp::View &view)
     view_queue_.push(view);
     return;
   }
-  nacl_mruby_did_change_view(mrb_, view.pp_resource());
+  nacl_mruby_did_change_view(mrb_, inst_, view.pp_resource());
 }
 
 void
 NaClMRubyInstance::DidChangeFocus(bool has_focus)
 {
-  nacl_mruby_did_change_focus(mrb_, has_focus ? PP_TRUE : PP_FALSE);
+  nacl_mruby_did_change_focus(mrb_, inst_, has_focus ? PP_TRUE : PP_FALSE);
 }
 
 bool
 NaClMRubyInstance::HandleInputEvent(const pp::InputEvent &event)
 {
-  return nacl_mruby_handle_input_event(mrb_, event.pp_resource());
+  return nacl_mruby_handle_input_event(mrb_, inst_, event.pp_resource());
 }
 
 bool
 NaClMRubyInstance::HandleDocumentLoad(const pp::URLLoader &url_loader)
 {
-  return nacl_mruby_handle_document_load(mrb_, url_loader.pp_resource());
+  return nacl_mruby_handle_document_load(mrb_, inst_, url_loader.pp_resource());
 }
 
 void
 NaClMRubyInstance::HandleMessage(const pp::Var &var_message)
 {
-  nacl_mruby_handle_message(mrb_, var_message.pp_var());
+  nacl_mruby_handle_message(mrb_, inst_, var_message.pp_var());
 }
 
 class NaClMRubyModule : public pp::Module {

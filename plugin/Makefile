@@ -39,10 +39,7 @@ $(LIBMRUBY_ARM): mruby-make
 .PHONY: mruby-make mruby-clean
 mruby-make:
 	@echo Building mruby...
-	@if cmp -s ./build_config.rb $(MRUBY)/build_config.rb; [ $$? -ne 0 ]; then \
-	  cp ./build_config.rb $(MRUBY)/build_config.rb; \
-	fi
-	@cd $(MRUBY); make
+	@cd $(MRUBY); MRUBY_CONFIG=$(CURDIR)/build_config.rb make
 mruby-clean:
 	@echo Cleaning mruby...
 	@cd $(MRUBY); make clean

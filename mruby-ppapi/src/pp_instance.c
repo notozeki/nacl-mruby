@@ -1,4 +1,5 @@
 #include <mruby.h>
+#include <mruby/class.h>
 #include <mruby/data.h>
 #include <mruby/string.h>
 
@@ -8,7 +9,7 @@
 
 struct RClass *mrb_pp_instance_class;
 
-static void
+void
 mrb_pp_instance_free(mrb_state *mrb, void *ptr)
 {
   struct mrb_pp_instance *instance = (struct mrb_pp_instance *)ptr;
@@ -16,20 +17,8 @@ mrb_pp_instance_free(mrb_state *mrb, void *ptr)
   mrb_free(mrb, instance);
 }
 
-static mrb_data_type mrb_pp_instance_type =
+mrb_data_type mrb_pp_instance_type =
   {"PP::Instance", mrb_pp_instance_free};
-
-mrb_value
-mrb_pp_instance_new(mrb_state *mrb, PP_Instance inst)
-{
-  struct mrb_pp_instance *instance;
-  struct RData *data;
-
-  Data_Make_Struct(mrb, mrb_pp_instance_class, struct mrb_pp_instance,
-		   &mrb_pp_instance_type, instance, data);
-  instance->instance = inst;
-  return mrb_obj_value(data);
-}
 
 static mrb_value
 bind_graphics(mrb_state *mrb, mrb_value self)
@@ -156,6 +145,7 @@ mrb_pp_instance_init(mrb_state *mrb)
   struct RClass *loglevel;
 
   mrb_pp_instance_class = mrb_define_class_under(mrb, mrb_pp_module, "Instance", mrb->object_class);
+  MRB_SET_INSTANCE_TT(mrb_pp_instance_class, MRB_TT_DATA);
 
   /* constants map to enum PP_LogLevel */
   loglevel = mrb_define_module_under(mrb, mrb_pp_module, "LogLevel");
