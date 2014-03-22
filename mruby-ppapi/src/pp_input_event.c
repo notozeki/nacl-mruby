@@ -1,4 +1,5 @@
 #include <mruby.h>
+#include <mruby/class.h>
 
 #include "ppb_interface.h"
 
@@ -45,6 +46,7 @@ mrb_pp_input_event_init(mrb_state *mrb)
   struct RClass *type, *modifier, *klass;
 
   mrb_pp_input_event_class = mrb_define_class_under(mrb, mrb_pp_module, "InputEvent", mrb_pp_resource_class);
+  MRB_SET_INSTANCE_TT(mrb_pp_input_event_class, MRB_TT_DATA);
 
   /* PP_InputEvent_Type constants */
   type = mrb_define_module_under(mrb, mrb_pp_input_event_class, "Type");

@@ -1,6 +1,7 @@
 #include <string.h> /* memset */
 
 #include <mruby.h>
+#include <mruby/class.h>
 #include <mruby/data.h>
 #include <mruby/string.h>
 
@@ -357,6 +358,7 @@ void
 mrb_pp_pointer_init(mrb_state *mrb)
 {
   mrb_pp_pointer_class = mrb_define_class_under(mrb, mrb_pp_module, "Pointer", mrb->object_class);
+  MRB_SET_INSTANCE_TT(mrb_pp_pointer_class, MRB_TT_DATA);
 
   mrb_define_class_method(mrb, mrb_pp_pointer_class, "to_ptr", c_to_ptr, MRB_ARGS_REQ(1));
   mrb_define_class_method(mrb, mrb_pp_pointer_class, "[]", c_to_ptr, MRB_ARGS_REQ(1));

@@ -1,4 +1,5 @@
 #include <mruby.h>
+#include <mruby/class.h>
 #include <mruby/data.h>
 #include <mruby/variable.h>
 
@@ -189,6 +190,7 @@ void
 mrb_pp_graphics_2d_init(mrb_state *mrb)
 {
   mrb_pp_graphics_2d_class = mrb_define_class_under(mrb, mrb_pp_module, "Graphics2D", mrb_pp_resource_class);
+  MRB_SET_INSTANCE_TT(mrb_pp_graphics_2d_class, MRB_TT_DATA);
 
   mrb_define_method(mrb, mrb_pp_graphics_2d_class, "initialize", initialize, MRB_ARGS_REQ(3));
   mrb_define_method(mrb, mrb_pp_graphics_2d_class, "size", size, MRB_ARGS_NONE());

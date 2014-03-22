@@ -66,6 +66,7 @@ void
 mrb_pp_resource_init(mrb_state *mrb)
 {
   mrb_pp_resource_class = mrb_define_class_under(mrb, mrb_pp_module, "Resource", mrb->object_class);
+  MRB_SET_INSTANCE_TT(mrb_pp_resource_class, MRB_TT_DATA);
 
   mrb_define_method(mrb, mrb_pp_resource_class, "initialize", initialize, MRB_ARGS_NONE());
   mrb_define_method(mrb, mrb_pp_resource_class, "is_null", is_null, MRB_ARGS_NONE());

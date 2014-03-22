@@ -1,5 +1,6 @@
-#include <mruby.h>
 #include <string.h> /* memset */
+#include <mruby.h>
+#include <mruby/class.h>
 
 #include "ppb_interface.h"
 
@@ -153,6 +154,7 @@ mrb_pp_image_data_init(mrb_state *mrb)
   struct RClass *image_data_format;
 
   mrb_pp_image_data_class = mrb_define_class_under(mrb, mrb_pp_module, "ImageData", mrb_pp_resource_class);
+  MRB_SET_INSTANCE_TT(mrb_pp_image_data_class, MRB_TT_DATA);
 
   /* PP_ImageDataFormat constants */
   image_data_format = mrb_define_module_under(mrb, mrb_pp_module, "ImageDataFormat");

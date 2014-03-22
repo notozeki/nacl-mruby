@@ -1,4 +1,5 @@
 #include <mruby.h>
+#include <mruby/class.h>
 
 #include "ppb_interface.h"
 
@@ -95,6 +96,7 @@ void
 mrb_pp_view_init(mrb_state *mrb)
 {
   mrb_pp_view_class = mrb_define_class_under(mrb, mrb_pp_module, "View", mrb_pp_resource_class);
+  MRB_SET_INSTANCE_TT(mrb_pp_view_class, MRB_TT_DATA);
 
   mrb_define_method(mrb, mrb_pp_view_class, "get_rect", get_rect, MRB_ARGS_NONE());
   mrb_define_method(mrb, mrb_pp_view_class, "is_fullscreen", is_fullscreen, MRB_ARGS_NONE());

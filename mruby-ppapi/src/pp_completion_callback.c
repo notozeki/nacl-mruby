@@ -1,7 +1,7 @@
 #include <mruby.h>
+#include <mruby/class.h>
 #include <mruby/data.h>
-
-#include "ppapi/c/pp_completion_callback.h"
+#include <ppapi/c/pp_completion_callback.h>
 
 #include "ppb_interface.h"
 
@@ -177,6 +177,7 @@ mrb_pp_completion_callback_init(mrb_state *mrb)
   struct RClass *flag;
 
   mrb_pp_completion_callback_class = mrb_define_class_under(mrb, mrb_pp_module, "CompletionCallback", mrb->object_class);
+  MRB_SET_INSTANCE_TT(mrb_pp_completion_callback_class, MRB_TT_DATA);
 
   /* PP_CompletionCallback_Flag constants */
   flag = mrb_define_module_under(mrb, mrb_pp_completion_callback_class, "Flag");

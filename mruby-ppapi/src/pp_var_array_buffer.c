@@ -1,4 +1,5 @@
 #include <mruby.h>
+#include <mruby/class.h>
 #include <mruby/numeric.h>
 #include <mruby/string.h>
 #include <mruby/variable.h>
@@ -94,6 +95,7 @@ void
 mrb_pp_var_array_buffer_init(mrb_state *mrb)
 {
   mrb_pp_var_array_buffer_class = mrb_define_class_under(mrb, mrb_pp_module, "VarArrayBuffer", mrb_pp_var_class);
+  MRB_SET_INSTANCE_TT(mrb_pp_var_array_buffer_class, MRB_TT_DATA);
 
   mrb_define_method(mrb, mrb_pp_var_array_buffer_class, "initialize", initialize, MRB_ARGS_OPT(1));
   mrb_define_method(mrb, mrb_pp_var_array_buffer_class, "byte_length", byte_length, MRB_ARGS_NONE());
