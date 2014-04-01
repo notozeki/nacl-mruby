@@ -8,6 +8,7 @@ extern "C" {
 #include "ppapi/c/ppb.h"
 #include "ppapi/c/ppb_console.h"
 #include "ppapi/c/ppb_core.h"
+#include "ppapi/c/ppb_fullscreen.h"
 #include "ppapi/c/ppb_graphics_2d.h"
 #include "ppapi/c/ppb_image_data.h"
 #include "ppapi/c/ppb_input_event.h"
@@ -24,6 +25,7 @@ extern "C" {
 struct PPB_Interface {
   PPB_Console *Console;
   PPB_Core *Core;
+  PPB_Fullscreen *Fullscreen;
   PPB_Graphics2D *Graphics2D;
   PPB_ImageData *ImageData;
   PPB_InputEvent *InputEvent;
