@@ -94,10 +94,10 @@ class PlottingMandelbrotSet < PP::Instance
         pixel = image.get_addr_32(PP::Point.new(x, y))
         iter = @mandelbrot.calc_from_coord(x, y)
         color = iter / @mandelbrot.max_iteration * 255
-        pixel[0] = color  # Blue
-        pixel[1] = color  # Green
-        pixel[2] = color  # Red
-        pixel[3] = "\xff" # Alpha
+        pixel[0] = color # Blue
+        pixel[1] = color # Green
+        pixel[2] = color # Red
+        pixel[3] = 0xff  # Alpha
       end
     end
 

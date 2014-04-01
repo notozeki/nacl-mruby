@@ -1,6 +1,7 @@
 #include <mruby.h>
 #include <mruby/class.h>
 #include <mruby/data.h>
+#include <mruby/variable.h>
 #include <ppapi/c/pp_completion_callback.h>
 
 #include "ppb_interface.h"
@@ -34,18 +35,21 @@ static mrb_data_type mrb_pp_completion_callback_type =
 
 struct callback_context {
   mrb_state *mrb;
-  mrb_value func;
-  mrb_value user_data;
+  mrb_value self;
 };
 
 static void
-callback(void *user_data, int32_t result)
+callback(void *ptr, int32_t result)
 {
-  struct callback_context *ctx = (struct callback_context *)user_data;
+  struct callback_context *ctx = (struct callback_context *)ptr;
   mrb_state *mrb = ctx->mrb;
+  mrb_value self = ctx->self;
+  mrb_value func, user_data;
 
-  mrb_funcall(mrb, ctx->func, "call",
-	      2, ctx->user_data, mrb_fixnum_value(result));
+  func = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "func"));
+  user_data = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "user_data"));
+
+  mrb_funcall(mrb, func, "call", 2, user_data, mrb_fixnum_value(result));
 
   mrb_free(mrb, ctx); /* well done (see initialize()) */
 }
@@ -81,12 +85,14 @@ initialize(mrb_state *mrb, mrb_value self)
     break;
   }
 
+  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "func"), func);
+  mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "user_data"), user_data);
+
   /* ctx must be free when callback finished */
   ctx = (struct callback_context *)
     mrb_malloc(mrb, sizeof(struct callback_context));
   ctx->mrb = mrb;
-  ctx->func = func;
-  ctx->user_data = user_data;
+  ctx->self = self;
 
   cc->cc = PP_MakeCompletionCallback(callback, ctx);
   cc->cc.flags |= flags;
