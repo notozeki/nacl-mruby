@@ -5,8 +5,9 @@ You can write NaCl applications in Ruby, and the Ruby code runs on the browser.
 __This is ALPHA version.__
 
 
-## For busy person
-Go to http://devel.notozeki.org/nacl-mruby/mandelbrot/ and see the plotting mandelbrot set demo!
+## Live demos
+* [repl](http://devel.notozeki.org/nacl-mruby/repl/): A read-eval-print loop console
+* [mandelbrot](http://devel.notozeki.org/nacl-mruby/mandelbrot/): Plotting mandelbrot set
 
 
 ## How to use
@@ -40,9 +41,10 @@ $ make
 Now you have `newlib` directory and nacl-mruby executables in it.
 
 ### 3. Run examples
-Currently there are two examples:
+Currently there are three examples:
 * examples/simple
 * examples/mandelbrot
+* examples/repl
 
 To run an example, change directory to the example directory, and run `make` and `make run`.
 ```bash
@@ -61,4 +63,4 @@ Now http server is running in the local, access `localhost:5103` from Google Chr
 under the MIT License:
 * http://www.opensource.org/licenses/mit-license.php
 
-Copyright (c) 2013 Yasuhiro KOSEKI
+Copyright (c) 2014 Yasuhiro KOSEKI
