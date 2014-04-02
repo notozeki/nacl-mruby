@@ -1,11 +1,12 @@
-# Write your Native Client applications in Ruby!
-nacl-mruby is a [Native Client (NaCl)](https://developers.google.com/native-client/) application development environment on [mruby](https://github.com/mruby/mruby).
-You can write NaCl applications in Ruby, and the Ruby code runs on the browser.
+# nacl-mruby
+nacl-mruby is a mruby interpreter works on [Native Client (NaCl)](https://developers.google.com/native-client/).
+Ruby code runs on the browser, and you can use Pepper API from Ruby.
 
 __This is ALPHA version.__
 
 
 ## Live demos
+Access these pages from Google Chrome browser.
 * [repl](http://devel.notozeki.org/nacl-mruby/repl/): A read-eval-print loop console
 * [mandelbrot](http://devel.notozeki.org/nacl-mruby/mandelbrot/): Plotting mandelbrot set
 
