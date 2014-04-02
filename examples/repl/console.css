@@ -1,0 +1,48 @@
+#console {
+    position: absolute;
+    width: 800px;
+    height: 500px;
+    background-color: black;
+}
+
+.jqconsole {
+    padding: 10px;
+}
+
+.jqconsole-cursor {
+    background-color: gray;
+}
+
+.jqconsole-blurred .jqconsole-corsor {
+    background-color: #666;
+}
+
+.jqconsole-header {
+    color: white;
+}
+
+.jqconsole-prompt {
+    color: #0d0;
+}
+
+.jqconsole-old-prompt {
+    color: #0b0;
+    font-weight: normal;
+}
+
+.jqconsole-input {
+    color: #dd0;
+}
+
+.jqconsole-old-input {
+    color: #bb0;
+    font-weight: normal;
+}
+
+.jqconsole-output {
+    color: white;
+}
+
+.jqconsole-output-exception {
+    color: #d00;
+}
