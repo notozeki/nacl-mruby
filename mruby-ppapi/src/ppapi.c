@@ -8,7 +8,7 @@
 struct RClass *mrb_pp_module;
 
 void
-mrb_ppapi_gem_init(mrb_state *mrb)
+mrb_mruby_ppapi_gem_init(mrb_state *mrb)
 {
   mrb_pp_module = mrb_define_module(mrb, "PP");
 
@@ -29,7 +29,7 @@ mrb_ppapi_gem_init(mrb_state *mrb)
 }
 
 void
-mrb_ppapi_gem_final(mrb_state *mrb)
+mrb_mruby_ppapi_gem_final(mrb_state *mrb)
 {
   /* nothing to do */
 }

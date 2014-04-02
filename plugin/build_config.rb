@@ -121,8 +121,27 @@ nacl_conf = NaClConfig.new('newlib')
 
     conf.archiver.command = nacl_conf.archiver(arch)
 
-    conf.gem "#{root}/mrbgems/mruby-math"
-    conf.gem "#{root}/mrbgems/mruby-random"
+    conf.gem :core => 'mruby-sprintf'
+    conf.gem :core => 'mruby-print'
+    conf.gem :core => 'mruby-math'
+    conf.gem :core => 'mruby-time'
+    conf.gem :core => 'mruby-struct'
+    conf.gem :core => 'mruby-enum-ext'
+    conf.gem :core => 'mruby-string-ext'
+    conf.gem :core => 'mruby-numeric-ext'
+    conf.gem :core => 'mruby-array-ext'
+    conf.gem :core => 'mruby-hash-ext'
+    conf.gem :core => 'mruby-range-ext'
+    conf.gem :core => 'mruby-proc-ext'
+    conf.gem :core => 'mruby-symbol-ext'
+    conf.gem :core => 'mruby-random'
+    conf.gem :core => 'mruby-object-ext'
+    conf.gem :core => 'mruby-objectspace'
+    conf.gem :core => 'mruby-fiber'
+    conf.gem :core => 'mruby-enumerator'
+    conf.gem :core => 'mruby-toplevel-ext'
+    conf.gem :core => 'mruby-eval'
+
     conf.gem '../mruby-ppapi' do |gemconf|
       gemconf.cc.include_paths << nacl_conf.include
       gemconf.cc.include_paths << '../include'
