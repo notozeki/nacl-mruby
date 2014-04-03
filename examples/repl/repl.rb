@@ -1,23 +1,3 @@
-def object_to_var(obj)
-  case obj
-  when Array
-    var_array = PP::VarArray.new
-    var_array.set_length = obj.length
-    obj.each.with_index do |e, i|
-      var_array.set(i, object_to_var(e))
-    end
-    var_array
-  when Hash
-    var_dict = PP::VarDictionary.new
-    obj.each do |k, v|
-      var_dict.set(object_to_var(k), object_to_var(v))
-    end
-    var_dict
-  else
-    PP::Var.new(obj)
-  end
-end
-
 class Repl < PP::Instance
   class Message
     TYPES = %w(request response exception)
@@ -31,8 +11,8 @@ class Repl < PP::Instance
     end
     attr_reader :type, :id, :body
 
-    def to_hash
-      {'type' => @type, 'id' => @id, 'body' => @body}
+    def to_var
+      {'type' => @type, 'id' => @id, 'body' => @body}.to_var
     end
 
     private
@@ -60,11 +40,12 @@ class Repl < PP::Instance
   end
 
   def initialize(args)
-    instance = self
-    # redirect stdout to JavaScript
-    Kernel.module_eval do |mod|
+    # To redirect stdout to JavaScript, overwrite Kernel#__printstr__
+    # (original is defined in mruby-print gem).
+    $instance = self
+    Kernel.module_eval do
       define_method :__printstr__ do |obj|
-        instance.post(obj)
+        $instance.post(obj)
       end
     end
   end
@@ -75,9 +56,13 @@ class Repl < PP::Instance
       raise 'not a request message'
     end
 
+    # To avoid crash when raises exception while executing code,
+    # enclose code with begin-rescue-end block.
     code =<<EOS
 begin
-  #{req.body}
+  $instance.instance_eval do
+    #{req.body}
+  end
 rescue => e
   e
 end
@@ -86,12 +71,16 @@ EOS
 
     type = (Exception === result) ? 'exception' : 'response'
     res = {'type' => type, 'id' => req.id, 'body' => result.inspect}
-    post(Message.new(res).to_hash)
+    post(Message.new(res))
   end
 
   private
   def post(obj)
-    post_message(object_to_var(obj))
+    post_message(obj.to_var)
+  end
+
+  def log(msg)
+    log_to_console(PP::LogLevel::LOG, msg.to_var)
   end
 end
 

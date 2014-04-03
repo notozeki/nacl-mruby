@@ -1,10 +1,5 @@
-// Called by the common.js module.
-function moduleDidLoad() {
-  common.hideModule();
-}
-
 $(function () {
-  var header = 'Welcome to nacl-mruby REPL console :)\n';
+  var header = 'Loading module...';
   var jqconsole = $('#console').jqconsole(header, '>> ');
   var seqid = 0;
   var startPrompt = function () {
@@ -14,7 +9,14 @@ $(function () {
                                      body: input});
     });
   };
-  // called by the common.js module.
+
+  // Called by the common.js module.
+  window.moduleDidLoad = function () {
+    common.hideModule();
+    jqconsole.Write('done.\nWelcome to nacl-mruby REPL console :)\n', 'jqconsole-header');
+    startPrompt();
+  };
+  // Called by the common.js module.
   window.handleMessage = function (message) {
     if (typeof(message.data) == 'string') { /* stdout */
       jqconsole.Write(message.data, 'jqconsole-output');
@@ -33,5 +35,4 @@ $(function () {
     }
     startPrompt();
   };
-  startPrompt();
 });
