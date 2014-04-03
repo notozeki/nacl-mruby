@@ -142,9 +142,10 @@ nacl_conf = NaClConfig.new('newlib')
     conf.gem :core => 'mruby-toplevel-ext'
     conf.gem :core => 'mruby-eval'
 
-    conf.gem '../mruby-ppapi' do |gemconf|
+    conf.gem '../mrbgems/mruby-ppapi' do |gemconf|
       gemconf.cc.include_paths << nacl_conf.include
       gemconf.cc.include_paths << '../include'
     end
+    conf.gem '../mrbgems/mruby-ppapi-var-ext'
   end
 end

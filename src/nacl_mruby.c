@@ -16,7 +16,7 @@
 
 #include "ppb_interface.h"
 #include "nacl_mruby.h"
-#include "../mruby-ppapi/src/ppapi.h"
+#include "../mrbgems/mruby-ppapi/src/ppapi.h"
 
 struct nacl_mruby_ud {
   PP_Instance instance;
