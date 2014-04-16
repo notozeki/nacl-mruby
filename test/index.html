@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>nacl-mruby Test Runner</title>
+
+  <script src="common.js"></script>
+  <script>
+    function handleMessage(message) {
+      common.logMessage(message.data);
+    }
+  </script>
+
+  <style>
+    #listener embed {
+        border: 1px solid gray;
+    }
+  </style>
+</head>
+
+<body data-name="nacl-mruby-test" data-tools="newlib" data-configs="Release" data-path="{tc}/{config}">
+  <h1>nacl-mruby Test Runner</h1>
+
+  <h2>Plugin Area</h2>
+  <div id="listener"></div>
+
+  <h2>Output</h2>
+  <pre id="log"></pre>
+</body>
+</html>
