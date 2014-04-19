@@ -236,8 +236,6 @@ as_bool(mrb_state *mrb, mrb_value self)
   }
 }
 
-/* name is 'int' but returns Fixnum if within the fixable range,
-   otherwise convert into Float */
 static mrb_value
 as_int(mrb_state *mrb, mrb_value self)
 {
@@ -248,25 +246,34 @@ as_int(mrb_state *mrb, mrb_value self)
     mrb_raise(mrb, E_TYPE_ERROR, "not a number value");
   }
 
+  /* If type is double, the number is converted into int. */
   if (var.type == PP_VARTYPE_INT32) {
     num = var.value.as_int;
-    if (FIXABLE(num)) {
-      return mrb_fixnum_value(num);
-    }
-    else {
-      return mrb_float_value(mrb, num);
-    }
   }
-  else { /* var.type == PP_VARTYPE_DOUBLE */
-    return mrb_float_value(mrb, var.value.as_double);
+  else {
+    num = var.value.as_double;
   }
+  return mrb_fixnum_value(num);
 }
 
-/* name is 'double' but returns Float */
 static mrb_value
 as_double(mrb_state *mrb, mrb_value self)
 {
-  return mrb_Float(mrb, as_int(mrb, self));
+  struct PP_Var var = MRB_PP_VAR(self);
+  mrb_float num;
+
+  if (!mrb_test(mrb_funcall(mrb, self, "is_number", 0))) {
+    mrb_raise(mrb, E_TYPE_ERROR, "not a number value");
+  }
+
+  /* If type is int, the number is converted into double. */
+  if (var.type == PP_VARTYPE_INT32) {
+    num = var.value.as_int;
+  }
+  else {
+    num = var.value.as_double;
+  }
+  return mrb_float_value(mrb, num);
 }
 
 static mrb_value
@@ -282,6 +289,48 @@ as_string(mrb_state *mrb, mrb_value self)
 
   s = PPB(Var)->VarToUtf8(var, &len);
   return mrb_str_new(mrb, s, len);
+}
+
+static mrb_value
+equal(mrb_state *mrb, mrb_value self)
+{
+  mrb_value other;
+
+  mrb_get_args(mrb, "o", &other);
+  if (!mrb_obj_is_kind_of(mrb, other, mrb_pp_var_class)) {
+    mrb_raisef(mrb, E_TYPE_ERROR, "%S is not a PP::Var object", other);
+  }
+
+  if (MRB_PP_VAR(self).type != MRB_PP_VAR(other).type) {
+    return mrb_false_value();
+  }
+  switch (MRB_PP_VAR(self).type) {
+  case PP_VARTYPE_UNDEFINED:
+  case PP_VARTYPE_NULL:
+    return mrb_true_value();
+
+  case PP_VARTYPE_BOOL:
+    return mrb_bool_value(mrb_equal(mrb, as_bool(mrb, self), as_bool(mrb, other)));
+
+  case PP_VARTYPE_INT32:
+    return mrb_bool_value(mrb_equal(mrb, as_int(mrb, self), as_int(mrb, other)));
+
+  case PP_VARTYPE_DOUBLE:
+    return mrb_bool_value(mrb_equal(mrb, as_double(mrb, self), as_double(mrb, other)));
+
+  case PP_VARTYPE_STRING:
+    if (MRB_PP_VAR(self).value.as_id == MRB_PP_VAR(other).value.as_id) {
+      return mrb_true_value();
+    }
+    return mrb_bool_value(mrb_equal(mrb, as_string(mrb, self), as_string(mrb, other)));
+
+  case PP_VARTYPE_OBJECT:
+  case PP_VARTYPE_ARRAY:
+  case PP_VARTYPE_ARRAY_BUFFER:
+  case PP_VARTYPE_DICTIONARY:
+  default:  // Objects, arrays, dictionaries.
+    return mrb_bool_value(MRB_PP_VAR(self).value.as_id == MRB_PP_VAR(other).value.as_id);
+  }
 }
 
 void
@@ -306,4 +355,5 @@ mrb_pp_var_init(mrb_state *mrb)
   mrb_define_method(mrb, mrb_pp_var_class, "as_int", as_int, MRB_ARGS_NONE());
   mrb_define_method(mrb, mrb_pp_var_class, "as_double", as_double, MRB_ARGS_NONE());
   mrb_define_method(mrb, mrb_pp_var_class, "as_string", as_string, MRB_ARGS_NONE());
+  mrb_define_method(mrb, mrb_pp_var_class, "==", equal, MRB_ARGS_REQ(1));
 }
