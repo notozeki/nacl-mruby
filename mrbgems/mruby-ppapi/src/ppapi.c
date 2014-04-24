@@ -15,6 +15,7 @@ mrb_mruby_ppapi_gem_init(mrb_state *mrb)
   mrb_pp_resource_init(mrb); /* must be initialized prior to any PP::Resource's subclasses */
   mrb_pp_completion_callback_init(mrb);
   mrb_pp_core_init(mrb);
+  mrb_pp_errors_init(mrb);
   mrb_pp_fullscreen_init(mrb);
   mrb_pp_graphics_2d_init(mrb);
   mrb_pp_image_data_init(mrb);
@@ -26,6 +27,7 @@ mrb_mruby_ppapi_gem_init(mrb_state *mrb)
   mrb_pp_var_array_buffer_init(mrb);
   mrb_pp_var_dictionary_init(mrb);
   mrb_pp_view_init(mrb);
+  mrb_pp_websocket_init(mrb);
 }
 
 void

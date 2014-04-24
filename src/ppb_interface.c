@@ -22,4 +22,5 @@ PPB_Interface_Init(PPB_GetInterface get_browser)
   PPB(VarArrayBuffer) = (PPB_VarArrayBuffer *)get_browser(PPB_VAR_ARRAY_BUFFER_INTERFACE);
   PPB(VarDictionary)  = (PPB_VarDictionary *)get_browser(PPB_VAR_DICTIONARY_INTERFACE);
   PPB(View)           = (PPB_View *)get_browser(PPB_VIEW_INTERFACE);
+  PPB(WebSocket)      = (PPB_WebSocket *)get_browser(PPB_WEBSOCKET_INTERFACE);
 }

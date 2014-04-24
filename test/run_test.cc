@@ -11,14 +11,17 @@
 #include <ppapi/utility/completion_callback_factory.h>
 
 #include "ppb_interface.h"
+#include "../mrbgems/mruby-ppapi/src/ppapi.h"
+
 
 class NaClMRubyTestInstance : public pp::Instance {
 public:
-  static NaClMRubyTestInstance *current_instance;
+  static PP_Instance getCurrentInstance() { return current_instance_; }
 
   explicit NaClMRubyTestInstance(PP_Instance instance)
     : pp::Instance(instance)
   {
+    current_instance_ = instance;
   }
   virtual ~NaClMRubyTestInstance() {}
 
@@ -28,11 +31,28 @@ public:
   virtual bool HandleInputEvent(const pp::InputEvent &event);
   virtual bool HandleDocumentLoad(const pp::URLLoader &url_loader);
   virtual void HandleMessage(const pp::Var &var_message);
+
+private:
+  static PP_Instance current_instance_;
 };
 
+PP_Instance NaClMRubyTestInstance::current_instance_ = 0;
 
-extern "C" void
-mrb_init_mrbtest(mrb_state *);
+/* For API which receives instance object */
+extern "C" mrb_value
+create_instance(mrb_state *mrb)
+{
+  struct mrb_pp_instance *inst;
+  struct RData *data;
+
+  inst = (struct mrb_pp_instance *)mrb_malloc(mrb, sizeof(struct mrb_pp_instance));
+  inst->instance = NaClMRubyTestInstance::getCurrentInstance();
+  data = mrb_data_object_alloc(mrb, mrb_pp_instance_class, inst, &mrb_pp_instance_type);
+  return mrb_obj_value(data);
+}
+
+
+/* Following functions are from mruby/test/driver.c */
 
 /* Print a short remark for the user */
 static void
@@ -96,7 +116,10 @@ mrb_t_printstr(mrb_state *mrb, mrb_value self)
   return argv;
 }
 
+extern "C" void
+mrb_init_mrbtest(mrb_state *);
 
+/* Based on main() of mruby/test/driver.c */
 bool
 NaClMRubyTestInstance::Init(uint32_t argc, const char *argn[], const char *argv[])
 {

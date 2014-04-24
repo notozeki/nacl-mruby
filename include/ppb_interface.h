@@ -21,6 +21,7 @@ extern "C" {
 #include "ppapi/c/ppb_var_array_buffer.h"
 #include "ppapi/c/ppb_var_dictionary.h"
 #include "ppapi/c/ppb_view.h"
+#include "ppapi/c/ppb_websocket.h"
 
 struct PPB_Interface {
   PPB_Console *Console;
@@ -38,6 +39,7 @@ struct PPB_Interface {
   PPB_VarArrayBuffer *VarArrayBuffer;
   PPB_VarDictionary *VarDictionary;
   PPB_View *View;
+  PPB_WebSocket *WebSocket;
 };
 extern struct PPB_Interface ppb_interface;
 

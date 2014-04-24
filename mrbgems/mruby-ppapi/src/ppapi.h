@@ -7,6 +7,7 @@ extern struct RClass *mrb_pp_module;
 
 #include "pp_completion_callback.h"
 #include "pp_core.h"
+#include "pp_errors.h"
 #include "pp_fullscreen.h"
 #include "pp_graphics_2d.h"
 #include "pp_image_data.h"
@@ -19,5 +20,6 @@ extern struct RClass *mrb_pp_module;
 #include "pp_var_array_buffer.h"
 #include "pp_var_dictionary.h"
 #include "pp_view.h"
+#include "pp_websocket.h"
 
 #endif /* MRUBY_PPAPI_PPAPI_H */
