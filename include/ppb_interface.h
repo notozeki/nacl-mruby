@@ -1,5 +1,5 @@
 #ifndef PPB_INTERFACE_H
-#define PPB_INTERFACE_h
+#define PPB_INTERFACE_H
 
 #if defined(__cplusplus)
 extern "C" {
