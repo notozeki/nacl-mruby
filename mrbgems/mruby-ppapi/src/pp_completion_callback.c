@@ -1,4 +1,5 @@
 #include <mruby.h>
+#include <mruby/array.h>
 #include <mruby/class.h>
 #include <mruby/data.h>
 #include <mruby/variable.h>
@@ -58,7 +59,7 @@ static mrb_value
 initialize(mrb_state *mrb, mrb_value self)
 {
   struct mrb_pp_completion_callback *cc;
-  mrb_value func, user_data;
+  mrb_value func, user_data, callbacks;
   mrb_int flags = 0, argc;
   struct callback_context *ctx;
 
@@ -70,7 +71,7 @@ initialize(mrb_state *mrb, mrb_value self)
   switch (argc) {
   case 0:
     /* nothing to do */
-    return self;
+    goto end;
     break;
 
   case 2:
@@ -89,14 +90,17 @@ initialize(mrb_state *mrb, mrb_value self)
   mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "user_data"), user_data);
 
   /* ctx must be free when callback finished */
-  ctx = (struct callback_context *)
-    mrb_malloc(mrb, sizeof(struct callback_context));
+  ctx = (struct callback_context *)mrb_malloc(mrb, sizeof(struct callback_context));
   ctx->mrb = mrb;
   ctx->self = self;
 
   cc->cc = PP_MakeCompletionCallback(callback, ctx);
-  cc->cc.flags |= flags;
+  cc->cc.flags = flags;
 
+ end:
+  /* to protect from GC, push self into __callbacks__ array which is class variable */
+  callbacks = mrb_mod_cv_get(mrb, mrb_pp_completion_callback_class, mrb_intern_lit(mrb, "__callbacks__"));
+  mrb_ary_push(mrb, callbacks, self);
   return self;
 }
 
@@ -184,6 +188,8 @@ mrb_pp_completion_callback_init(mrb_state *mrb)
 
   mrb_pp_completion_callback_class = mrb_define_class_under(mrb, mrb_pp_module, "CompletionCallback", mrb->object_class);
   MRB_SET_INSTANCE_TT(mrb_pp_completion_callback_class, MRB_TT_DATA);
+
+  mrb_mod_cv_set(mrb, mrb_pp_completion_callback_class, mrb_intern_lit(mrb, "__callbacks__"), mrb_ary_new(mrb));
 
   /* PP_CompletionCallback_Flag constants */
   flag = mrb_define_module_under(mrb, mrb_pp_completion_callback_class, "Flag");
