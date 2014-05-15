@@ -14,6 +14,7 @@ extern "C" {
 #include "ppapi/c/ppb_input_event.h"
 #include "ppapi/c/ppb_instance.h"
 #include "ppapi/c/ppb_messaging.h"
+#include "ppapi/c/ppb_net_address.h"
 #include "ppapi/c/ppb_url_loader.h"
 #include "ppapi/c/ppb_url_request_info.h"
 #include "ppapi/c/ppb_var.h"
@@ -32,6 +33,7 @@ struct PPB_Interface {
   PPB_InputEvent *InputEvent;
   PPB_Instance *Instance;
   PPB_Messaging *Messaging;
+  PPB_NetAddress *NetAddress;
   PPB_URLLoader *URLLoader;
   PPB_URLRequestInfo *URLRequestInfo;
   PPB_Var *Var;
