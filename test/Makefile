@@ -31,7 +31,7 @@ ARM_LDFLAGS    = -L$(MRUBY)/build/nacl_arm/lib
 
 TARGET = nacl-mruby-test
 DEPS = mruby mrbtest
-LIBS = $(DEPS) ppapi ppapi_cpp pthread
+LIBS = $(DEPS) ppapi ppapi_cpp pthread pcre
 SOURCES = run_test.cc $(NACL_MRUBY_ROOT)/src/ppb_interface.c
 
 

@@ -31,7 +31,7 @@ ARM_LDFLAGS    = -L$(MRUBY)/build/nacl_arm/lib
 
 TARGET = nacl-mruby
 DEPS = mruby
-LIBS = $(DEPS) ppapi ppapi_cpp pthread
+LIBS = $(DEPS) ppapi ppapi_cpp pthread pcre
 SOURCES = plugin.cc remote_file_loader.cc $(wildcard $(NACL_MRUBY_ROOT)/src/*.c)
 
 

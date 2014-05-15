@@ -75,6 +75,8 @@ nacl_conf = NaClConfig.new('newlib')
     conf.gem :core => 'mruby-toplevel-ext'
     conf.gem :core => 'mruby-eval'
 
+    conf.gem :git => 'https://github.com/mattn/mruby-pcre-regexp.git'
+
     conf.gem '../mrbgems/mruby-ppapi' do |gemconf|
       gemconf.cc.include_paths << nacl_conf.include
       gemconf.cc.include_paths << '../include'
